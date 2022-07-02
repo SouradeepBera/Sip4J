@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.sprinklr.javasip.utils.ConstantValues.sipAllowedMethods;
+import static com.sprinklr.javasip.utils.ConstantValues.SIP_ALLOWED_METHODS;
 
 /*
 * Controller class for Agent
@@ -44,7 +44,7 @@ public class AgentController {
             config.put(key, val);
         }
 
-        AgentConfig agentConfig = new AgentConfig.Builder(config.get("transportMode"), sipAllowedMethods, config.get("password"), config.get("agentName"))
+        AgentConfig agentConfig = new AgentConfig.Builder(config.get("transportMode"), SIP_ALLOWED_METHODS, config.get("password"), config.get("agentName"))
                 .sipConfig(config.get("sipLocalIp"), Integer.parseInt(config.get("sipLocalPort")), config.get("sipLocalUsername"),config.get("sipLocalRealm"),
                         config.get("sipLocalDisplayName"), config.get("sipRegistrarIp"), Integer.parseInt(config.get("sipRegistrarPort")), Integer.parseInt(config.get("sipRegisterExpiryTimeSec")))
                 .rtpConfig(config.get("rtpLocalIp"), Integer.parseInt(config.get("rtpLocalPort")), config.get("rtpAddressType"),
