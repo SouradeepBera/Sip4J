@@ -14,7 +14,9 @@ import java.nio.file.Files;
  */
 public class AudioHelper {
 
-    private AudioHelper(){}
+    private AudioHelper(){
+        throw new IllegalStateException("Utility class");
+    }
 
     /*
      * Generates an audio file from the stream. The file must be a WAV file.

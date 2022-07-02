@@ -24,7 +24,9 @@ public class DigestMD5Converter {
         }
     }
 
-    private DigestMD5Converter(){}
+    private DigestMD5Converter(){
+        throw new IllegalStateException("Utility class");
+    }
 
     private static String hashToMD5(String... args) throws NoSuchAlgorithmException {
         if(md==null){

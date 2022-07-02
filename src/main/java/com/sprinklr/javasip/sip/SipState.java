@@ -5,6 +5,10 @@ package com.sprinklr.javasip.sip;
  */
 public class SipState {
 
+    private SipState(){
+        throw new IllegalStateException("Utility class");
+    }
+
     public static final String CONNECTING = "CONNECTING";
 
     public static final String CONNECTED = "CONNECTED";
@@ -16,7 +20,5 @@ public class SipState {
     public static final String UNREGISTERED = "UNREGISTERED";
 
     public static final String REGISTRATION_FAILED = "REGISTRATION_FAILED";
-
-    private SipState(){}
 
 }
