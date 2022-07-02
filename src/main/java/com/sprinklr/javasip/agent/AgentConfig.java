@@ -1,6 +1,7 @@
 package com.sprinklr.javasip.agent;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.sprinklr.javasip.utils.Constants.RTP_HEADER_SIZE;
@@ -149,5 +150,44 @@ public class AgentConfig {
         wsServerUri = builder.wsServerUri;
 
         password = builder.password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AgentConfig that = (AgentConfig) o;
+        return sipLocalPort == that.sipLocalPort && sipRegistrarPort == that.sipRegistrarPort && sipRegisterExpiryTimeSec == that.sipRegisterExpiryTimeSec && rtpLocalPort == that.rtpLocalPort && rtpPayloadSize == that.rtpPayloadSize && rtpPacketSize == that.rtpPacketSize && agentName.equals(that.agentName) && transportMode.equals(that.transportMode) && sipLocalIp.equals(that.sipLocalIp) && sipLocalUsername.equals(that.sipLocalUsername) && sipLocalRealm.equals(that.sipLocalRealm) && sipLocalDisplayName.equals(that.sipLocalDisplayName) && sipRegistrarIp.equals(that.sipRegistrarIp) && sipAllowedMethods.equals(that.sipAllowedMethods) && sipLocalTag.equals(that.sipLocalTag) && rtpLocalIp.equals(that.rtpLocalIp) && rtpAddressType.equals(that.rtpAddressType) && rtpNetworkType.equals(that.rtpNetworkType) && wsServerUri.equals(that.wsServerUri) && password.equals(that.password);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(agentName, transportMode, sipLocalIp, sipLocalPort, sipLocalUsername, sipLocalRealm, sipLocalDisplayName, sipRegistrarIp, sipRegistrarPort, sipRegisterExpiryTimeSec, sipAllowedMethods, sipLocalTag, rtpLocalPort, rtpLocalIp, rtpAddressType, rtpNetworkType, rtpPayloadSize, rtpPacketSize, wsServerUri, password);
+    }
+
+    @Override
+    public String toString() {
+        return "AgentConfig{" +
+                "agentName='" + agentName + '\'' +
+                ", transportMode='" + transportMode + '\'' +
+                ", sipLocalIp='" + sipLocalIp + '\'' +
+                ", sipLocalPort=" + sipLocalPort +
+                ", sipLocalUsername='" + sipLocalUsername + '\'' +
+                ", sipLocalRealm='" + sipLocalRealm + '\'' +
+                ", sipLocalDisplayName='" + sipLocalDisplayName + '\'' +
+                ", sipRegistrarIp='" + sipRegistrarIp + '\'' +
+                ", sipRegistrarPort=" + sipRegistrarPort +
+                ", sipRegisterExpiryTimeSec=" + sipRegisterExpiryTimeSec +
+                ", sipAllowedMethods=" + sipAllowedMethods +
+                ", sipLocalTag='" + sipLocalTag + '\'' +
+                ", rtpLocalPort=" + rtpLocalPort +
+                ", rtpLocalIp='" + rtpLocalIp + '\'' +
+                ", rtpAddressType='" + rtpAddressType + '\'' +
+                ", rtpNetworkType='" + rtpNetworkType + '\'' +
+                ", rtpPayloadSize=" + rtpPayloadSize +
+                ", rtpPacketSize=" + rtpPacketSize +
+                ", wsServerUri='" + wsServerUri + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }
