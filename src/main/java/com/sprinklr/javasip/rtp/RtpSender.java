@@ -14,13 +14,14 @@ Agent's RTP sender which sends data packets to Ozonetel in the RTP session
  */
 public class RtpSender implements Runnable{
 
-    private final Queue<byte[]> outboundRtpQueue;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RtpSender.class);
 
+    private final Queue<byte[]> outboundRtpQueue;
     private final RtpAddress rtpRemoteAddress;
     private final AgentConfig agentConfig;
 
     private volatile boolean exit = false;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RtpSender.class);
+
 
     public RtpSender(RtpAddress rtpRemoteAddress, Queue<byte[]> outboundRtpQueue, AgentConfig agentConfig) {
         this.rtpRemoteAddress = rtpRemoteAddress;
