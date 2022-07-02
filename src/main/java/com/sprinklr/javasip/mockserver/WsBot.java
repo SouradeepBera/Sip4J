@@ -1,4 +1,4 @@
-package com.sprinklr.javasip.foreign;
+package com.sprinklr.javasip.mockserver;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;

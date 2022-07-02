@@ -1,4 +1,4 @@
-package com.sprinklr.javasip.foreign;
+package com.sprinklr.javasip.mockserver;
 
 import com.sprinklr.javasip.rtp.RtpPacket;
 import com.sprinklr.javasip.utils.AudioHelper;
