@@ -2,6 +2,9 @@ package com.sprinklr.javasip.rtp;
 
 import java.util.Objects;
 
+/*
+* Describes a complete RTP address
+ */
 public class RtpAddress {
 
     private final int port;

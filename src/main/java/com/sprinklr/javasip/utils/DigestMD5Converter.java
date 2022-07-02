@@ -8,6 +8,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 
+/*
+* Helper class to handle digest authentication
+ */
 public class DigestMD5Converter {
 
     private static MessageDigest md;

@@ -7,6 +7,9 @@ import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
+/*
+* Singleton which initialises sip+sdp factories
+ */
 public class SipAllFactories {
     private final SipFactory sipFactory;
     private final SdpFactory sdpFactory;

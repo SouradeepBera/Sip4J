@@ -16,6 +16,9 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* Mocks entity which will receive RTP packets on Ozonetel's end
+ */
 public class RtpOzonetelReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpOzonetelReceiver.class);

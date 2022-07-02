@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
+/*
+* Stores state of agent in sip entity and websocket entity.
+ */
 public class AgentState {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgentState.class);

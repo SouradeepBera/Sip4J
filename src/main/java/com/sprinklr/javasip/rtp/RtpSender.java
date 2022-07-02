@@ -9,6 +9,9 @@ import java.net.*;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
+/*
+Agent's RTP sender which sends data packets to Ozonetel in the RTP session
+ */
 public class RtpSender implements Runnable{
 
     private final Queue<byte[]> outboundRtpQueue;

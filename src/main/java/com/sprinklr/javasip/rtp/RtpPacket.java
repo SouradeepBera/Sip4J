@@ -4,7 +4,9 @@ import java.util.Arrays;
 
 import static com.sprinklr.javasip.utils.ConstantValues.RTP_HEADER_SIZE;
 
-
+/*
+RTP Packet transported between RTP endpoints
+ */
 public class RtpPacket {
 
     //Fields that compose the RTP header, refer https://dl.acm.org/doi/pdf/10.17487/RFC3550

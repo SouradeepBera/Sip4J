@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Queue;
 
-
+/*
+* Agent's RTP receiver which receives data packets from Ozonetel in RTP session
+ */
 public class RtpReceiver implements Runnable{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiver.class);

@@ -21,6 +21,9 @@ import java.util.Queue;
 import java.util.TooManyListenersException;
 import java.util.concurrent.*;
 
+/*
+* Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
+ */
 public class Agent implements Runnable{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);

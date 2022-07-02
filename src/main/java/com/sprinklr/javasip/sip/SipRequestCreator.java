@@ -18,6 +18,9 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+/*
+* Helper class which creates requests
+ */
 public class SipRequestCreator {
     private final SipProvider sipProvider;
     private final AddressFactory addressFactory;

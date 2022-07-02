@@ -9,6 +9,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 
+/*
+* Helper class for audio related things
+ */
 public class AudioHelper {
 
     /*

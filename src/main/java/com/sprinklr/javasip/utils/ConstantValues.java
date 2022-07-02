@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/*
+* Defines values which remain constant throughout
+ */
 public class ConstantValues {
 
     public static final List<String> sipAllowedMethods = Collections.unmodifiableList(Arrays.asList(Request.INVITE, Request.BYE, Request.CANCEL, Request.ACK));

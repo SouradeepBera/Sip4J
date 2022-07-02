@@ -1,5 +1,8 @@
 package com.sprinklr.javasip.sip;
 
+/*
+* Defines constants for state of sip entity
+ */
 public class SipState {
 
     public static final String CONNECTING = "CONNECTING";

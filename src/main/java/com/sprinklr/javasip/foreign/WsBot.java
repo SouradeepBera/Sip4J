@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
+/*
+Mocks the bot websocket server which receives data from Agent's Websocket Client Entity
+ */
 public class WsBot extends WebSocketServer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WsBot.class);

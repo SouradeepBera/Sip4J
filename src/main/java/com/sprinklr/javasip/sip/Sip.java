@@ -23,6 +23,9 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+/*
+* Sip entity which handles singalling on Agent's behalf
+ */
 public class Sip implements SipListener, Callable<RtpAddress> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sip.class);

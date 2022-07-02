@@ -4,8 +4,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/*
+* Manager class. Stores agents mapped by agent names
+ */
 public class AgentManager {
-    private final Map<String, Agent> agentMapper = new ConcurrentHashMap<>();
+    private final Map<String, Agent> agentMapper;
+
+    public AgentManager(){
+        agentMapper = new ConcurrentHashMap<>();
+    }
 
     public void addAgent(Agent agent, AgentConfig agentConfig){
         agentMapper.put(agentConfig.agentName, agent);

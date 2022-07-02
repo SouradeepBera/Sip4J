@@ -14,6 +14,10 @@ import javax.sip.message.Response;
 import java.util.ArrayList;
 import java.util.Properties;
 
+/*
+* Mocks the sip entity on Ozonetel's end which sends INVITE requests and acts as UAC.
+* Also, mocks registrar server where local (Sprinklr's) UA is to be registered.
+ */
 public class SipOzonetel implements SipListener, Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SipOzonetel.class);

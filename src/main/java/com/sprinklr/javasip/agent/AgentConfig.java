@@ -5,7 +5,9 @@ import java.util.UUID;
 
 import static com.sprinklr.javasip.utils.ConstantValues.RTP_HEADER_SIZE;
 
-
+/*
+* Configuration for Agent
+ */
 public class AgentConfig {
 
     public final String agentName;

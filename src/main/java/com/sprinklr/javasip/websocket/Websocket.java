@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 
+/*
+* Agent's websocket entity which communicates for media transfer with bot
+ */
 public class Websocket extends WebSocketClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(Websocket.class);
     private final Queue<byte[]> outboundRtpQueue;

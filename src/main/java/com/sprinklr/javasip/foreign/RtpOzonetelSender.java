@@ -13,6 +13,9 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
+/*
+* Mocks entity which will send data packets via RTP from Ozonetel
+ */
 public class RtpOzonetelSender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpOzonetelSender.class);
