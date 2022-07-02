@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class ConstantValues {
 
-    public static final List<String> sipAllowedMethods = Collections.unmodifiableList(Arrays.asList(Request.INVITE, Request.BYE, Request.CANCEL, Request.ACK));
+    public static final List<String> SIP_ALLOWED_METHODS = Collections.unmodifiableList(Arrays.asList(Request.INVITE, Request.BYE, Request.CANCEL, Request.ACK));
     public static final int RTP_HEADER_SIZE = 12;
 
     private ConstantValues(){}
