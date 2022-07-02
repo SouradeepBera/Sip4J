@@ -38,7 +38,7 @@ public class RtpReceiver implements Runnable{
             serverSocket.setSoTimeout(1000);
             while(!exit)
             {
-                getBytes(serverSocket);
+                readBytes(serverSocket);
             }
 
         } catch (SocketException e) {
@@ -47,7 +47,7 @@ public class RtpReceiver implements Runnable{
         LOGGER.info("{} stopped listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
     }
 
-    private void getBytes(DatagramSocket serverSocket) {
+    private void readBytes(DatagramSocket serverSocket) {
         byte[] receiveData;
         DatagramPacket receivePacket;
         try{
