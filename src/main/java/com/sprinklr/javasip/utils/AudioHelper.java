@@ -12,6 +12,8 @@ import java.nio.file.Files;
  */
 public class AudioHelper {
 
+    private static final String WAV = "wav";
+
     private AudioHelper() {
         throw new IllegalStateException("Utility class");
     }
@@ -24,7 +26,7 @@ public class AudioHelper {
      *            written onto the file
      */
     public static void generateFile(byte[] data, File outputFile) throws IOException, UnsupportedAudioFileException {
-        boolean isWavFile = outputFile.getName().endsWith("wav");
+        boolean isWavFile = outputFile.getName().endsWith(WAV);
         if (!isWavFile) {
             throw new IllegalArgumentException("Unsupported encoding " + outputFile);
         }
