@@ -23,6 +23,8 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
+
 /*
  * Sip entity which handles singalling on Agent's behalf
  */
@@ -82,7 +84,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     public RtpAddress call() throws InterruptedException {
         while (!isCallableReady) {
             //wait for rtpRemoteAddress to be initialised
-            Thread.sleep(20); //sleeping for 20ms to save cpu cycles
+            Thread.sleep(SLEEP_CPU_TIME_MS); //sleeping for specified time to save cpu cycles
         }
         return rtpRemoteAddress;
     }

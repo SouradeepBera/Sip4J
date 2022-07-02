@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Queue;
 
+import static com.sprinklr.javasip.utils.Constants.RTP_BLOCK_SOCKET_TIME_MS;
+
 /*
  * Agent's RTP receiver which receives data packets from Ozonetel in RTP session
  */
@@ -35,7 +37,7 @@ public class RtpReceiver implements Runnable {
         try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.rtpLocalPort, localRtpIp)) {
 
             LOGGER.info("{} listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
-            serverSocket.setSoTimeout(1000); //block on receive for 1sec = 1000ms
+            serverSocket.setSoTimeout(RTP_BLOCK_SOCKET_TIME_MS); //block on receive for specified time
             while (!exit) {
                 readBytes(serverSocket);
             }

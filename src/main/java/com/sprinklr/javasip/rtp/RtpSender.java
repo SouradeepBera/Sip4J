@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.*;
 import java.util.Queue;
-import java.util.concurrent.TimeUnit;
+
+import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
 
 /*
 Agent's RTP sender which sends data packets to Ozonetel in the RTP session
@@ -47,7 +48,7 @@ public class RtpSender implements Runnable {
 
                 byte[] data = outboundRtpQueue.poll(); //packet size should be correctly configured and sent from bot websocket server side
                 if (data == null) {
-                    Thread.sleep(TimeUnit.MILLISECONDS.toMillis(20)); //sleep or use blocking queue, refer https://www.baeldung.com/java-concurrent-queues
+                    Thread.sleep(SLEEP_CPU_TIME_MS); //sleep or use blocking queue, refer https://www.baeldung.com/java-concurrent-queues
                     continue;
                 }
 
