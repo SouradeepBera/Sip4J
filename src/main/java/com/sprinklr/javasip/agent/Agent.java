@@ -21,6 +21,8 @@ import java.util.Queue;
 import java.util.TooManyListenersException;
 import java.util.concurrent.*;
 
+import static com.sprinklr.javasip.utils.Constants.WS_RECONNECT_CODE;
+
 /*
  * Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
  */
@@ -111,7 +113,7 @@ public class Agent implements Runnable {
                     continue;
                 websocket.send(data);
             } catch (WebsocketNotConnectedException e) {
-                if (agentState.getWsCloseCode() == 1006) {
+                if (agentState.getWsCloseCode() == WS_RECONNECT_CODE) {
                     websocket.reconnect(); //reconnecting immediately, thread.sleep to delay
                     LOGGER.info("Reconnecting {} to bot websocket server", agentConfig.agentName);
                 }

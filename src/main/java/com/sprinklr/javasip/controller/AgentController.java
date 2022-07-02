@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.sprinklr.javasip.utils.ConstantValues.SIP_ALLOWED_METHODS;
+import static com.sprinklr.javasip.utils.Constants.SIP_ALLOWED_METHODS;
 
 /*
  * Controller class for Agent

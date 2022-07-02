@@ -2,7 +2,7 @@ package com.sprinklr.javasip.rtp;
 
 import java.util.Arrays;
 
-import static com.sprinklr.javasip.utils.ConstantValues.RTP_HEADER_SIZE;
+import static com.sprinklr.javasip.utils.Constants.RTP_HEADER_SIZE;
 
 /*
 RTP Packet transported between RTP endpoints

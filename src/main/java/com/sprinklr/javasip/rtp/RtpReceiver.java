@@ -35,7 +35,7 @@ public class RtpReceiver implements Runnable {
         try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.rtpLocalPort, localRtpIp)) {
 
             LOGGER.info("{} listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
-            serverSocket.setSoTimeout(1000);
+            serverSocket.setSoTimeout(1000); //block on receive for 1sec = 1000ms
             while (!exit) {
                 readBytes(serverSocket);
             }

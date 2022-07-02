@@ -22,6 +22,8 @@ import java.util.ArrayList;
  * Helper class which creates requests
  */
 public class SipRequestCreator {
+
+    private static final String AUTHENTICATION_SCHEME = "Digest";
     private final SipProvider sipProvider;
     private final AddressFactory addressFactory;
     private final MessageFactory messageFactory;
@@ -93,12 +95,12 @@ public class SipRequestCreator {
 
     public Request createRegisterRequestWithCredentials(Response response) throws ParseException, InvalidArgumentException, NoSuchAlgorithmException {
 
-        WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response.getHeader("WWW-Authenticate"); //names of headers in last line of respective header file in jain-sip-ri
-        if (!"Digest".equals(wwwAuthenticateHeader.getScheme())) { //Scheme of authorization should be Digest
+        WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response.getHeader(WWWAuthenticateHeader.NAME); //names of headers in last line of respective header file in jain-sip-ri
+        if (!AUTHENTICATION_SCHEME.equals(wwwAuthenticateHeader.getScheme())) { //Scheme of authorization should be Digest
             throw new NoSuchAlgorithmException();
         }
         Request newRequest = createRegisterRequest();
-        CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader("Call-ID");
+        CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
         newRequest.setHeader(oldCallIdHeader); //All registrations from a UAC SHOULD use the same Call-ID header field value for registrations sent to a particular registrar
         String userName = agentConfig.sipLocalUsername;
         String realm = wwwAuthenticateHeader.getRealm();

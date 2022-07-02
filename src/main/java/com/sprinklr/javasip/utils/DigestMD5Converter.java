@@ -13,12 +13,13 @@ import java.util.Collections;
  */
 public class DigestMD5Converter {
 
-    private static MessageDigest md;
     private static final Logger LOGGER = LoggerFactory.getLogger(DigestMD5Converter.class);
+    private static final String MD5_ALGORITHM = "MD5";
+    private static MessageDigest md;
 
     static {
         try {
-            md = MessageDigest.getInstance("MD5");
+            md = MessageDigest.getInstance(MD5_ALGORITHM);
         } catch (NoSuchAlgorithmException e) {
             md = null;
         }

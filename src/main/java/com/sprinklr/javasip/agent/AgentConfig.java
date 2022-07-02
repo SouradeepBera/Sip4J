@@ -3,7 +3,7 @@ package com.sprinklr.javasip.agent;
 import java.util.List;
 import java.util.UUID;
 
-import static com.sprinklr.javasip.utils.ConstantValues.RTP_HEADER_SIZE;
+import static com.sprinklr.javasip.utils.Constants.RTP_HEADER_SIZE;
 
 /*
  * Configuration for Agent
