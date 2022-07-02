@@ -37,7 +37,7 @@ public class Agent implements Runnable{
 
     public void start() {
 
-        SipAllFactories sipAllFactories = null;
+        SipAllFactories sipAllFactories;
         try {
             sipAllFactories = SipAllFactories.getInstance();
         } catch (PeerUnavailableException e) {
@@ -53,7 +53,7 @@ public class Agent implements Runnable{
         executor.setCorePoolSize(3);
         executor.setMaximumPoolSize(20);
 
-        Sip sip = null;
+        Sip sip ;
         try {
             sip = new Sip(sipAllFactories, agentState, agentConfig);
         } catch (PeerUnavailableException | TransportNotSupportedException | InvalidArgumentException |
@@ -67,7 +67,7 @@ public class Agent implements Runnable{
          */
         Future<RtpAddress> rtpRemoteAddressFuture = executor.submit(sip);
 
-        RtpAddress rtpRemoteAddress = null;
+        RtpAddress rtpRemoteAddress;
         try {
             rtpRemoteAddress = rtpRemoteAddressFuture.get();
         } catch (InterruptedException e) {
@@ -90,7 +90,7 @@ public class Agent implements Runnable{
         executor.execute(rtpReceiver); //1 new thread started
 
         //connect websocket to botserver (make sure botserver is running)
-        Websocket websocket = null;
+        Websocket websocket;
         try {
             websocket = new Websocket(outboundRtpQueue, agentState, agentConfig);
         } catch (URISyntaxException e) {
