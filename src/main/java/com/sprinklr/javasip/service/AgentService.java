@@ -33,9 +33,8 @@ public class AgentService {
 
     public void startAgent(Map<String, Object> body){
         Map<String, String> config = new HashMap<>();
-        for (String key : body.keySet()) {
-            String val = (String) body.get(key);
-            config.put(key, val);
+        for (Map.Entry<String, Object> entry : body.entrySet()) {
+            config.put(entry.getKey(), (String) entry.getValue());
         }
 
         AgentConfig agentConfig = new AgentConfig.Builder(config.get("transportMode"), SIP_ALLOWED_METHODS, config.get("password"), config.get("agentName"))

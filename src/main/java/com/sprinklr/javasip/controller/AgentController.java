@@ -2,9 +2,10 @@ package com.sprinklr.javasip.controller;
 
 import com.sprinklr.javasip.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,22 +21,22 @@ public class AgentController {
     @Autowired
     AgentService agentService;
 
-    @RequestMapping(value = "/start", method = RequestMethod.POST)
+    @PostMapping(value = "/start")
     public void startAgent(@RequestBody Map<String, Object> body) {
         agentService.startAgent(body);
     }
 
-    @RequestMapping(value = "/shutdown", method = RequestMethod.GET)
+    @GetMapping(value = "/shutdown")
     public void shutdown() {
         agentService.shutdown();
     }
 
-    @RequestMapping(value = "/allStatus", method = RequestMethod.GET)
+    @GetMapping(value = "/allStatus")
     public List<String> showAllStatus() {
         return agentService.showAllStatus();
     }
 
-    @RequestMapping(value = "/reconnectDisconnected", method = RequestMethod.GET)
+    @GetMapping(value = "/reconnectDisconnected")
     public List<String> reconnectDisconnected() {
         return agentService.reconnectDisconnected();
     }
