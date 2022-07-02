@@ -3,7 +3,7 @@ package com.sprinklr.javasip.agent;
 import com.sprinklr.javasip.rtp.RtpAddress;
 import com.sprinklr.javasip.rtp.RtpReceiver;
 import com.sprinklr.javasip.rtp.RtpSender;
-import com.sprinklr.javasip.sip.Sip;
+import com.sprinklr.javasip.sip.SipExtension;
 import com.sprinklr.javasip.sip.SipAllFactories;
 import com.sprinklr.javasip.sip.SipState;
 import com.sprinklr.javasip.websocket.Websocket;
@@ -53,9 +53,9 @@ public class Agent implements Runnable{
         executor.setCorePoolSize(3);
         executor.setMaximumPoolSize(20);
 
-        Sip sip ;
+        SipExtension sip ;
         try {
-            sip = new Sip(sipAllFactories, agentState, agentConfig);
+            sip = new SipExtension(sipAllFactories, agentState, agentConfig);
         } catch (PeerUnavailableException | TransportNotSupportedException | InvalidArgumentException |
                  ObjectInUseException | TooManyListenersException | ParseException e) {
             LOGGER.error("Sip object not created for {}: {}", agentConfig.agentName, e.toString());

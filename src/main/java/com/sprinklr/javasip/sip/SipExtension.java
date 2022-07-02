@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit;
 /*
 * Sip entity which handles singalling on Agent's behalf
  */
-public class Sip implements SipListener, Callable<RtpAddress> {
+public class SipExtension implements SipListener, Callable<RtpAddress> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Sip.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SipExtension.class);
 
     private final SdpFactory sdpFactory;
     private final AddressFactory addressFactory;
@@ -48,7 +48,7 @@ public class Sip implements SipListener, Callable<RtpAddress> {
     private RtpAddress rtpRemoteAddress;
     private volatile boolean isCallableReady = false;
 
-    public Sip(SipAllFactories sipAllFactories, AgentState agentState, AgentConfig agentConfig) throws PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException, ObjectInUseException, TooManyListenersException, ParseException {
+    public SipExtension(SipAllFactories sipAllFactories, AgentState agentState, AgentConfig agentConfig) throws PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException, ObjectInUseException, TooManyListenersException, ParseException {
 
         this.agentState = agentState;
         this.agentConfig = agentConfig;
