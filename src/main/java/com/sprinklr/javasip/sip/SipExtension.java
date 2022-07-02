@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 /*
-* Sip entity which handles singalling on Agent's behalf
+ * Sip entity which handles singalling on Agent's behalf
  */
 public class SipExtension implements SipListener, Callable<RtpAddress> {
 
@@ -75,12 +75,12 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         //re-registers to prevent expiry
         timer.scheduleAtFixedRate(sendRegisterRequestTask,
                 0,      // run first occurrence immediately
-                TimeUnit.SECONDS.toMillis(agentConfig.sipRegisterExpiryTimeSec/2)); // run every REGISTER_EXPIRY_TIME/2 seconds
+                TimeUnit.SECONDS.toMillis(agentConfig.sipRegisterExpiryTimeSec / 2)); // run every REGISTER_EXPIRY_TIME/2 seconds
     }
 
     @Override
     public RtpAddress call() throws InterruptedException {
-        while(!isCallableReady){
+        while (!isCallableReady) {
             //wait for rtpRemoteAddress to be initialised
             Thread.sleep(20); //sleeping for 20ms to save cpu cycles
         }
@@ -88,17 +88,17 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     }
 
     //Handle authentication if required by modifying function. Refer https://www.youtube.com/watch?v=iJeJ072UejI
-    class SendRegisterRequestTask extends TimerTask{
+    class SendRegisterRequestTask extends TimerTask {
 
         @Override
         public void run() {
-            try{
+            try {
                 //create client transaction
                 ClientTransaction registerTransaction = sipProvider.getNewClientTransaction(registerRequest);
                 //send the request
                 registerTransaction.sendRequest();
                 LOGGER.info("{} sent REGISTER request", agentConfig.agentName);
-            } catch (Exception ex){
+            } catch (Exception ex) {
                 agentState.setSipState(SipState.REGISTRATION_FAILED);
                 LOGGER.error("Error while sending REGISTER request in {}: {}", agentConfig.agentName, ex.toString());
             }
@@ -116,7 +116,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         LOGGER.info("Request {} received at {} with serverTransaction:{}",
                 request.getMethod(), sipStack.getStackName(), serverTransaction);
 
-        switch(request.getMethod()){
+        switch (request.getMethod()) {
             case Request.INVITE:
                 processInviteRequest(requestEvent, serverTransaction);
                 break;
@@ -143,12 +143,12 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
         LOGGER.info("{} received a response: Status Code = {} {}", agentConfig.agentName, response.getStatusCode(), cseq);
-        if(cseq == null){
+        if (cseq == null) {
             LOGGER.warn("Empty cseq header, response not processed in {}", agentConfig.agentName);
             return;
         }
 
-        if (!Request.REGISTER.equals(cseq.getMethod())){
+        if (!Request.REGISTER.equals(cseq.getMethod())) {
             LOGGER.error("Not a response for REGISTER request, not processing response in {}", agentConfig.agentName);
             return;
         }
@@ -159,10 +159,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     /*
     Process the response to our REGISTER request, acting as UAC
      */
-    public void processRegisterResponse(Response response){
+    public void processRegisterResponse(Response response) {
         if (response.getStatusCode() == Response.OK) {
             agentState.setSipState(SipState.REGISTERED);
-        } else if (response.getStatusCode() == Response.UNAUTHORIZED){
+        } else if (response.getStatusCode() == Response.UNAUTHORIZED) {
             LOGGER.info("Received {} for REGISTER request, resending from {}", Response.UNAUTHORIZED, agentConfig.agentName);
             try {
                 Request newRegisterRequest = sipRequestCreator.createRegisterRequestWithCredentials(response);
@@ -185,7 +185,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
      */
     public void processAckRequest(ServerTransaction serverTransaction) {
         LOGGER.info("{} (UAS): got an ACK! ", agentConfig.agentName);
-        if(serverTransaction.getDialog() == null) {
+        if (serverTransaction.getDialog() == null) {
             LOGGER.info("Dialog for {} is null", agentConfig.agentName);
         } else {
             LOGGER.info("Dialog State in {} = {}", agentConfig.agentName, serverTransaction.getDialog().getState());
@@ -199,7 +199,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
         Request request = requestEvent.getRequest();
 
-        if(!agentState.getSipState().equals(SipState.REGISTERED))
+        if (!agentState.getSipState().equals(SipState.REGISTERED))
             return;
 
         try {
@@ -309,7 +309,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         LOGGER.warn("Transaction Timeout event received for {}", agentConfig.agentName);
         LOGGER.info("{} state = {}", agentConfig.agentName, transaction.getState());
         LOGGER.info("{} dialog = {}", agentConfig.agentName, transaction.getDialog());
-        if(transaction.getDialog() != null) {
+        if (transaction.getDialog() != null) {
             LOGGER.info("{} dialogState = {}", agentConfig.agentName, transaction.getDialog().getState());
         }
     }
@@ -349,7 +349,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    public SessionDescription extractSDP(RequestEvent requestEvent){
+    public SessionDescription extractSDP(RequestEvent requestEvent) {
         Request request = requestEvent.getRequest();
         byte[] sdpContent = (byte[]) request.getContent();
         SessionDescription sessionDescription = null;
@@ -361,14 +361,14 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         return sessionDescription;
     }
 
-    public Connection extractConnection(SessionDescription sdp){
+    public Connection extractConnection(SessionDescription sdp) {
         return sdp.getConnection();
     }
 
-    public Media extractMedia(SessionDescription sdp){
+    public Media extractMedia(SessionDescription sdp) {
         Media media = null;
         try {
-            Vector<MediaDescription> mediaDescriptions= sdp.getMediaDescriptions(false);
+            Vector<MediaDescription> mediaDescriptions = sdp.getMediaDescriptions(false);
             MediaDescription mediaDescription = mediaDescriptions.get(0);
             media = mediaDescription.getMedia();
         } catch (SdpException e) {

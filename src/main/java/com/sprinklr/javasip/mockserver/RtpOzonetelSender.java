@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
 /*
-* Mocks entity which will send data packets via RTP from Ozonetel
+ * Mocks entity which will send data packets via RTP from Ozonetel
  */
 public class RtpOzonetelSender {
 

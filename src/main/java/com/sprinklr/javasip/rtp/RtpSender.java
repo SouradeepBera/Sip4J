@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /*
 Agent's RTP sender which sends data packets to Ozonetel in the RTP session
  */
-public class RtpSender implements Runnable{
+public class RtpSender implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpSender.class);
 
@@ -33,20 +33,20 @@ public class RtpSender implements Runnable{
 
         InetAddress remoteRtpIp = null;
         int remoteRtpPort = rtpRemoteAddress.getPort();
-        try{
+        try {
             remoteRtpIp = InetAddress.getByName(rtpRemoteAddress.getAddress());
         } catch (UnknownHostException e) {
             LOGGER.error("UnknownHostException in {}: {}", agentConfig.agentName, e.toString());
         }
 
-        try(DatagramSocket datagramSocket = new DatagramSocket()){
+        try (DatagramSocket datagramSocket = new DatagramSocket()) {
 
             LOGGER.info("Starting rtp transmission from {}", agentConfig.agentName);
 
-            while(!exit){
+            while (!exit) {
 
                 byte[] data = outboundRtpQueue.poll(); //packet size should be correctly configured and sent from bot websocket server side
-                if(data == null) {
+                if (data == null) {
                     Thread.sleep(TimeUnit.MILLISECONDS.toMillis(20)); //sleep or use blocking queue, refer https://www.baeldung.com/java-concurrent-queues
                     continue;
                 }
@@ -64,12 +64,12 @@ public class RtpSender implements Runnable{
 
     private void sendBytes(InetAddress remoteRtpIp, int remoteRtpPort, DatagramSocket datagramSocket, byte[] data) {
         DatagramPacket sendPacket;
-        try{
+        try {
             sendPacket = new DatagramPacket(data, data.length, remoteRtpIp, remoteRtpPort);
             datagramSocket.send(sendPacket);
-        } catch(UnknownHostException e){
+        } catch (UnknownHostException e) {
             LOGGER.error("UnknownHostException in {}: {}", agentConfig.agentName, e.toString());
-        } catch(IOException e){
+        } catch (IOException e) {
             LOGGER.error("IOException in {}: {} ", agentConfig.agentName, e.toString());
         }
     }
@@ -85,7 +85,7 @@ public class RtpSender implements Runnable{
         }
     }
 
-    public void stop(){
+    public void stop() {
         exit = true;
     }
 

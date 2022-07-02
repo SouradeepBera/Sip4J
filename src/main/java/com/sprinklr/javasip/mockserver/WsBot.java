@@ -36,8 +36,8 @@ public class WsBot extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        LOGGER.info("closed {} with exit code {}, additional info: {}", conn.getRemoteSocketAddress() , code, reason);
-        Thread stopServerThread = new Thread(()-> {
+        LOGGER.info("closed {} with exit code {}, additional info: {}", conn.getRemoteSocketAddress(), code, reason);
+        Thread stopServerThread = new Thread(() -> {
             try {
                 LOGGER.info("Stopping bot websocket server thread.");
                 stop();
@@ -55,7 +55,7 @@ public class WsBot extends WebSocketServer {
     }
 
     @Override
-    public void onMessage( WebSocket conn, ByteBuffer message ) {
+    public void onMessage(WebSocket conn, ByteBuffer message) {
         conn.send(message);
     }
 

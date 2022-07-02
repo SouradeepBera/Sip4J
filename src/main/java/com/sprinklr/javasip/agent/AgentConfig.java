@@ -6,7 +6,7 @@ import java.util.UUID;
 import static com.sprinklr.javasip.utils.ConstantValues.RTP_HEADER_SIZE;
 
 /*
-* Configuration for Agent
+ * Configuration for Agent
  */
 public class AgentConfig {
 
@@ -55,7 +55,7 @@ public class AgentConfig {
      */
     public final String password;
 
-    public static class Builder{
+    public static class Builder {
 
         private final String agentName;
         private final String transportMode;
@@ -92,7 +92,7 @@ public class AgentConfig {
             this.agentName = agentName;
         }
 
-        public Builder sipConfig(String sipLocalIp, int sipLocalPort, String sipLocalUsername, String sipLocalRealm, String sipLocalDisplayName, String sipRegistrarIp, int sipRegistrarPort, int sipRegisterExpiryTimeSec){
+        public Builder sipConfig(String sipLocalIp, int sipLocalPort, String sipLocalUsername, String sipLocalRealm, String sipLocalDisplayName, String sipRegistrarIp, int sipRegistrarPort, int sipRegisterExpiryTimeSec) {
             this.sipLocalIp = sipLocalIp;
             this.sipLocalPort = sipLocalPort;
             this.sipLocalUsername = sipLocalUsername;
@@ -104,7 +104,7 @@ public class AgentConfig {
             return this;
         }
 
-        public Builder rtpConfig(String rtpLocalIp, int rtpLocalPort, String rtpAddressType, String rtpNetworkType, int rtpPayloadSize){
+        public Builder rtpConfig(String rtpLocalIp, int rtpLocalPort, String rtpAddressType, String rtpNetworkType, int rtpPayloadSize) {
             this.rtpLocalIp = rtpLocalIp;
             this.rtpLocalPort = rtpLocalPort;
             this.rtpAddressType = rtpAddressType;
@@ -114,17 +114,17 @@ public class AgentConfig {
             return this;
         }
 
-        public Builder wsConfig(String wsServerUri){
+        public Builder wsConfig(String wsServerUri) {
             this.wsServerUri = wsServerUri;
             return this;
         }
 
-        public AgentConfig build(){
+        public AgentConfig build() {
             return new AgentConfig(this);
         }
     }
 
-    private AgentConfig(Builder builder){
+    private AgentConfig(Builder builder) {
         agentName = builder.agentName;
         transportMode = builder.transportMode;
 

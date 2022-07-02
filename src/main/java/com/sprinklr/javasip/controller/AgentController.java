@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static com.sprinklr.javasip.utils.ConstantValues.SIP_ALLOWED_METHODS;
 
 /*
-* Controller class for Agent
+ * Controller class for Agent
  */
 @RestController
 @RequestMapping(value = "/agent")
@@ -36,19 +36,19 @@ public class AgentController {
     }
 
     @RequestMapping(value = "/start", method = RequestMethod.POST)
-    public void startAgent(@RequestBody Map<String, Object> body){
+    public void startAgent(@RequestBody Map<String, Object> body) {
 
         Map<String, String> config = new HashMap<>();
-        for(String key : body.keySet()) {
+        for (String key : body.keySet()) {
             String val = (String) body.get(key);
             config.put(key, val);
         }
 
         AgentConfig agentConfig = new AgentConfig.Builder(config.get("transportMode"), SIP_ALLOWED_METHODS, config.get("password"), config.get("agentName"))
-                .sipConfig(config.get("sipLocalIp"), Integer.parseInt(config.get("sipLocalPort")), config.get("sipLocalUsername"),config.get("sipLocalRealm"),
+                .sipConfig(config.get("sipLocalIp"), Integer.parseInt(config.get("sipLocalPort")), config.get("sipLocalUsername"), config.get("sipLocalRealm"),
                         config.get("sipLocalDisplayName"), config.get("sipRegistrarIp"), Integer.parseInt(config.get("sipRegistrarPort")), Integer.parseInt(config.get("sipRegisterExpiryTimeSec")))
                 .rtpConfig(config.get("rtpLocalIp"), Integer.parseInt(config.get("rtpLocalPort")), config.get("rtpAddressType"),
-                        config.get("rtpNetworkType"),  Integer.parseInt(config.get("rtpPayloadSize")))
+                        config.get("rtpNetworkType"), Integer.parseInt(config.get("rtpPayloadSize")))
                 .wsConfig(config.get("wsServerUri"))
                 .build();
 
@@ -58,14 +58,14 @@ public class AgentController {
     }
 
     @RequestMapping(value = "/shutdown", method = RequestMethod.GET)
-    public void shutdown(){
+    public void shutdown() {
         executor.shutdown();
     }
 
     @RequestMapping(value = "/allStatus", method = RequestMethod.GET)
-    public List<String> showAllStatus(){
+    public List<String> showAllStatus() {
         List<String> statuses = new ArrayList<>();
-        for(String agentName : agentManager.getNames()){
+        for (String agentName : agentManager.getNames()) {
             String status = agentName + " " + agentManager.getAgentByName(agentName).getState();
             statuses.add(status);
         }
@@ -73,21 +73,21 @@ public class AgentController {
     }
 
     @RequestMapping(value = "/reconnectDisconnected", method = RequestMethod.GET)
-    public List<String> reconnectDisconnected(){
+    public List<String> reconnectDisconnected() {
         List<String> infoMsgList = new ArrayList<>();
-        for(String agentName : agentManager.getNames()){
+        for (String agentName : agentManager.getNames()) {
             Agent agent = agentManager.getAgentByName(agentName);
             AgentState agentState = agent.getState();
             AgentConfig agentConfig = agent.getConfig();
-           if(SipState.DISCONNECTED.equals(agentState.getSipState())){
-               agent.shutdown();
-               agentManager.removeAgentByName(agentName);
+            if (SipState.DISCONNECTED.equals(agentState.getSipState())) {
+                agent.shutdown();
+                agentManager.removeAgentByName(agentName);
 
-               Agent newAgent = new Agent(agentConfig);
-               agentManager.addAgent(newAgent, agentConfig);
-               executor.submit(newAgent);
-               infoMsgList.add("Reconnected " + agentName);
-           }
+                Agent newAgent = new Agent(agentConfig);
+                agentManager.addAgent(newAgent, agentConfig);
+                executor.submit(newAgent);
+                infoMsgList.add("Reconnected " + agentName);
+            }
         }
         return infoMsgList;
     }

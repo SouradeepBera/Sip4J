@@ -3,7 +3,7 @@ package com.sprinklr.javasip.rtp;
 import java.util.Objects;
 
 /*
-* Describes a complete RTP address
+ * Describes a complete RTP address
  */
 public class RtpAddress {
 

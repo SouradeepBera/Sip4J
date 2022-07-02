@@ -22,9 +22,9 @@ import java.util.TooManyListenersException;
 import java.util.concurrent.*;
 
 /*
-* Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
+ * Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
  */
-public class Agent implements Runnable{
+public class Agent implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);
     private AgentConfig agentConfig;
@@ -53,7 +53,7 @@ public class Agent implements Runnable{
         executor.setCorePoolSize(3);
         executor.setMaximumPoolSize(20);
 
-        SipExtension sip ;
+        SipExtension sip;
         try {
             sip = new SipExtension(sipAllFactories, agentState, agentConfig);
         } catch (PeerUnavailableException | TransportNotSupportedException | InvalidArgumentException |
@@ -62,8 +62,8 @@ public class Agent implements Runnable{
             return;
         }
         /*
-        * Refer to jain-sip-ri/gov.nist/javax/sip/SipStackImpl and src/main/java/com.spr/sip/Sip to understand threading
-        * Currently, javax.sip.REENTRANT_LISTENER = false and javax.sip.THREAD_POOL_SIZE=infinity (defaults).Change properties if behaviour is to be changed
+         * Refer to jain-sip-ri/gov.nist/javax/sip/SipStackImpl and src/main/java/com.spr/sip/Sip to understand threading
+         * Currently, javax.sip.REENTRANT_LISTENER = false and javax.sip.THREAD_POOL_SIZE=infinity (defaults).Change properties if behaviour is to be changed
          */
         Future<RtpAddress> rtpRemoteAddressFuture = executor.submit(sip);
 
@@ -80,7 +80,7 @@ public class Agent implements Runnable{
         }
 
 
-        if(!(rtpRemoteAddress.getAddressType().equals(agentConfig.rtpAddressType)) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.rtpNetworkType)) ){
+        if (!(rtpRemoteAddress.getAddressType().equals(agentConfig.rtpAddressType)) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.rtpNetworkType))) {
             LOGGER.error("Rtp address type or network type not matching. Check {}", agentConfig.agentName);
             return;
         }
@@ -104,14 +104,14 @@ public class Agent implements Runnable{
         RtpSender rtpSender = new RtpSender(rtpRemoteAddress, outboundRtpQueue, agentConfig);
         executor.execute(rtpSender); //1 new thread started
 
-        while(!agentState.getSipState().equals(SipState.DISCONNECTED)){
-            try{
+        while (!agentState.getSipState().equals(SipState.DISCONNECTED)) {
+            try {
                 byte[] data = inboundRtpQueue.poll();
-                if(data==null)
+                if (data == null)
                     continue;
                 websocket.send(data);
-            } catch(WebsocketNotConnectedException e){
-                if(agentState.getWsCloseCode()==1006){
+            } catch (WebsocketNotConnectedException e) {
+                if (agentState.getWsCloseCode() == 1006) {
                     websocket.reconnect(); //reconnecting immediately, thread.sleep to delay
                     LOGGER.info("Reconnecting {} to bot websocket server", agentConfig.agentName);
                 }
@@ -125,15 +125,15 @@ public class Agent implements Runnable{
 
     }
 
-    public AgentConfig getConfig(){
+    public AgentConfig getConfig() {
         return agentConfig;
     }
 
-    public AgentState getState(){
+    public AgentState getState() {
         return agentState;
     }
 
-    public void shutdown(){
+    public void shutdown() {
         agentConfig = null;
         agentState = null;
     }

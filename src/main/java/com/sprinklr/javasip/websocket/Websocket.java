@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.util.Queue;
 
 /*
-* Agent's websocket entity which communicates for media transfer with bot
+ * Agent's websocket entity which communicates for media transfer with bot
  */
 public class Websocket extends WebSocketClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(Websocket.class);
@@ -40,7 +40,7 @@ public class Websocket extends WebSocketClient {
     }
 
     @Override
-    public void onMessage(ByteBuffer byteBuffer){
+    public void onMessage(ByteBuffer byteBuffer) {
         outboundRtpQueue.offer(byteBuffer.array());
     }
 
@@ -53,7 +53,7 @@ public class Websocket extends WebSocketClient {
     @Override
     public void onError(Exception ex) {
 
-        if(LOGGER.isErrorEnabled() && ex != null){
+        if (LOGGER.isErrorEnabled() && ex != null) {
             LOGGER.error("Error occurred in {}: {}", agentConfig.agentName, ex.toString());
         }
 

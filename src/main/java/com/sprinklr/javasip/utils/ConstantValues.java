@@ -6,11 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 /*
-* Define values which remain constant throughout
+ * Define values which remain constant throughout
  */
 public class ConstantValues {
 
-    private ConstantValues(){
+    private ConstantValues() {
         throw new IllegalStateException("Utility class");
     }
 

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /*
-* Mocks entity which will receive RTP packets on Ozonetel's end
+ * Mocks entity which will receive RTP packets on Ozonetel's end
  */
 public class RtpOzonetelReceiver {
 
@@ -43,14 +43,13 @@ public class RtpOzonetelReceiver {
     }
 
     public void run(int port) throws IOException, UnsupportedAudioFileException {
-        try (DatagramSocket serverSocket = new DatagramSocket(port)){
+        try (DatagramSocket serverSocket = new DatagramSocket(port)) {
             InetAddress inetAddress = InetAddress.getByName(RTP_REMOTE_IP);
 
             LOGGER.info("Listening on udp:{}:{}", inetAddress, port);
             serverSocket.setSoTimeout(5000); //shutdown after 5sec, not handled by us. This is Ozonetel's side, they should shut it down accordingly
 
-            while(!exit)
-            {
+            while (!exit) {
                 getBytes(serverSocket);
             }
         } catch (IOException e) {
@@ -60,7 +59,7 @@ public class RtpOzonetelReceiver {
         LOGGER.info("Total size={}", storeRecv.size());
         File outputFile = new File(WRITE_AUDIO_FILE);
         ByteArrayOutputStream rawBuffer = new ByteArrayOutputStream();
-        for(byte[] b : storeRecv){
+        for (byte[] b : storeRecv) {
             RtpPacket rtpPacket = new RtpPacket(b, RTP_PACKET_SIZE);
             byte[] payload = new byte[RTP_PAYLOAD_SIZE];
             rtpPacket.getPayload(payload);
@@ -75,13 +74,12 @@ public class RtpOzonetelReceiver {
     private void getBytes(DatagramSocket serverSocket) throws IOException {
         DatagramPacket receivePacket;
         byte[] receiveData;
-        try{
+        try {
             receiveData = new byte[RTP_PACKET_SIZE];
             receivePacket = new DatagramPacket(receiveData, RTP_PACKET_SIZE);
             serverSocket.receive(receivePacket);
             storeRecv.add(receivePacket.getData());
-        }
-        catch(SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             exit = true;
         }
     }

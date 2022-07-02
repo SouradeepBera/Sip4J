@@ -8,7 +8,7 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
 /*
-* Singleton which initialises sip+sdp factories
+ * Singleton which initialises sip+sdp factories
  */
 public class SipAllFactories {
     private final SipFactory sipFactory;
@@ -28,7 +28,7 @@ public class SipAllFactories {
     }
 
     public static SipAllFactories getInstance() throws PeerUnavailableException {
-        if(singleInstance == null){
+        if (singleInstance == null) {
             singleInstance = new SipAllFactories();
         }
         return singleInstance;

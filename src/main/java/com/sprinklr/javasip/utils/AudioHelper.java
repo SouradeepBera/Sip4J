@@ -10,11 +10,11 @@ import java.nio.ByteOrder;
 import java.nio.file.Files;
 
 /*
-* Helper class for audio related things
+ * Helper class for audio related things
  */
 public class AudioHelper {
 
-    private AudioHelper(){
+    private AudioHelper() {
         throw new IllegalStateException("Utility class");
     }
 
@@ -27,7 +27,7 @@ public class AudioHelper {
      */
     public static void generateFile(byte[] data, File outputFile) throws IOException, UnsupportedAudioFileException {
         boolean isWavFile = outputFile.getName().endsWith("wav");
-        if(!isWavFile){
+        if (!isWavFile) {
             throw new IllegalArgumentException("Unsupported encoding " + outputFile);
         }
         AudioInputStream audioStream = getAudioStream(data);
@@ -46,8 +46,7 @@ public class AudioHelper {
             ByteArrayInputStream byteStream =
                     new ByteArrayInputStream(byteArray);
             return AudioSystem.getAudioInputStream(byteStream);
-        }
-        catch (UnsupportedAudioFileException e) {
+        } catch (UnsupportedAudioFileException e) {
             byteArray = addWavHeader(byteArray);
             ByteArrayInputStream byteStream =
                     new ByteArrayInputStream(byteArray);

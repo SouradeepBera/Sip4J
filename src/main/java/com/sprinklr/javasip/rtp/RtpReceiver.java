@@ -9,9 +9,9 @@ import java.net.*;
 import java.util.Queue;
 
 /*
-* Agent's RTP receiver which receives data packets from Ozonetel in RTP session
+ * Agent's RTP receiver which receives data packets from Ozonetel in RTP session
  */
-public class RtpReceiver implements Runnable{
+public class RtpReceiver implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiver.class);
     private final Queue<byte[]> inboundRtpQueue;
@@ -23,21 +23,20 @@ public class RtpReceiver implements Runnable{
         this.agentConfig = agentConfig;
     }
 
-    public void start(){
+    public void start() {
 
         InetAddress localRtpIp = null;
-        try{
+        try {
             localRtpIp = InetAddress.getByName(agentConfig.rtpLocalIp);
         } catch (UnknownHostException e) {
             LOGGER.error("UnknownHostException in {}: {}", agentConfig.agentName, e.toString());
         }
 
-        try(DatagramSocket serverSocket = new DatagramSocket(agentConfig.rtpLocalPort, localRtpIp)){
+        try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.rtpLocalPort, localRtpIp)) {
 
             LOGGER.info("{} listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
             serverSocket.setSoTimeout(1000);
-            while(!exit)
-            {
+            while (!exit) {
                 readBytes(serverSocket);
             }
 
@@ -50,13 +49,13 @@ public class RtpReceiver implements Runnable{
     private void readBytes(DatagramSocket serverSocket) {
         byte[] receiveData;
         DatagramPacket receivePacket;
-        try{
+        try {
             receiveData = new byte[agentConfig.rtpPacketSize];
             receivePacket = new DatagramPacket(receiveData, agentConfig.rtpPacketSize);
             serverSocket.receive(receivePacket);
 
             inboundRtpQueue.offer(receivePacket.getData());
-        } catch(SocketTimeoutException e){
+        } catch (SocketTimeoutException e) {
             //no message received, timeout, check for exit condition in while loop
         } catch (IOException e) {
             LOGGER.error("IOException in {}: {} ", agentConfig.agentName, e.toString());
@@ -68,7 +67,7 @@ public class RtpReceiver implements Runnable{
         start();
     }
 
-    public void stop(){
+    public void stop() {
         exit = true;
     }
 

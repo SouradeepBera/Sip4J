@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 /*
-* Mocks the sip entity on Ozonetel's end which sends INVITE requests and acts as UAC.
-* Also, mocks registrar server where local (Sprinklr's) UA is to be registered.
+ * Mocks the sip entity on Ozonetel's end which sends INVITE requests and acts as UAC.
+ * Also, mocks registrar server where local (Sprinklr's) UA is to be registered.
  */
 public class SipOzonetel implements SipListener, Runnable {
 
@@ -40,7 +40,7 @@ public class SipOzonetel implements SipListener, Runnable {
 
     private Dialog dialog;
 
-    boolean isShutdown=false;
+    boolean isShutdown = false;
 
     @Override
     public void run() {
@@ -53,7 +53,7 @@ public class SipOzonetel implements SipListener, Runnable {
 
     public void sendBye() {
         try {
-            if(dialog == null){
+            if (dialog == null) {
                 LOGGER.warn("Null dialog for bye");
                 return;
             }
@@ -95,7 +95,7 @@ public class SipOzonetel implements SipListener, Runnable {
             Dialog currDialog = serverTransactionId.getDialog();
             LOGGER.info("Dialog = {}", currDialog);
 
-            if(request.getHeader("Authorization") == null) {
+            if (request.getHeader("Authorization") == null) {
                 LOGGER.info("Auth required, sneding 401");
                 Response response = messageFactory.createResponse(Response.UNAUTHORIZED, request);
                 /*
@@ -136,7 +136,7 @@ public class SipOzonetel implements SipListener, Runnable {
         if (tid == null) {
 
             // RFC3261: MUST respond to every 2xx
-            if (ackRequest!=null && dialog!=null) {
+            if (ackRequest != null && dialog != null) {
                 LOGGER.info("re-sending ACK");
                 try {
                     dialog.sendAck(ackRequest);
@@ -153,13 +153,13 @@ public class SipOzonetel implements SipListener, Runnable {
             if (response.getStatusCode() == Response.OK) {
                 if (cseq.getMethod().equals(Request.INVITE)) {
                     LOGGER.info("Dialog after 200 OK  {}", dialog);
-                    LOGGER.info("Dialog State after 200 OK  {}" , dialog.getState());
-                    ackRequest = dialog.createAck( ((CSeqHeader) response.getHeader(CSeqHeader.NAME)).getSeqNumber() );
+                    LOGGER.info("Dialog State after 200 OK  {}", dialog.getState());
+                    ackRequest = dialog.createAck(((CSeqHeader) response.getHeader(CSeqHeader.NAME)).getSeqNumber());
                     LOGGER.info("Sending ACK");
                     dialog.sendAck(ackRequest);
 
                 } else if (cseq.getMethod().equals(Request.CANCEL) && dialog.getState() == DialogState.CONFIRMED) {
-                        // oops cancel went in too late. Need to hang up the dialog
+                    // oops cancel went in too late. Need to hang up the dialog
                     LOGGER.info("Sending BYE -- cancel went in too late !!");
                     sendBye();
                     shutDown();
@@ -178,11 +178,9 @@ public class SipOzonetel implements SipListener, Runnable {
 
     public void init() {
 
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
-            public void run()
-            {
+            public void run() {
                 sendBye();
             }
         });
@@ -263,7 +261,7 @@ public class SipOzonetel implements SipListener, Runnable {
             String ipAddress = udpListeningPoint.getIPAddress();
             ViaHeader viaHeader = headerFactory.createViaHeader(ipAddress,
                     sipProvider.getListeningPoint(transport).getPort(),
-                    transport, "z9hG4bK"+"83783"); //z9hG4bK83783 is the branch, refer https://andrewjprokop.wordpress.com/2014/03/06/understanding-the-sip-via-header/
+                    transport, "z9hG4bK" + "83783"); //z9hG4bK83783 is the branch, refer https://andrewjprokop.wordpress.com/2014/03/06/understanding-the-sip-via-header/
 
             // add via headers
             viaHeaders.add(viaHeader);
@@ -361,7 +359,7 @@ public class SipOzonetel implements SipListener, Runnable {
 
     public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
         LOGGER.info("dialogTerminatedEvent");
-        if(!isShutdown)
+        if (!isShutdown)
             shutDown();
     }
 
@@ -384,7 +382,7 @@ public class SipOzonetel implements SipListener, Runnable {
             messageFactory = null;
             this.udpListeningPoint = null;
             LOGGER.info("Client shutdown");
-            isShutdown=true;
+            isShutdown = true;
 
         } catch (Exception ex) {
             ex.printStackTrace();

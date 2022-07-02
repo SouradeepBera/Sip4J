@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 
 /*
-* Helper class to handle digest authentication
+ * Helper class to handle digest authentication
  */
 public class DigestMD5Converter {
 
@@ -24,12 +24,12 @@ public class DigestMD5Converter {
         }
     }
 
-    private DigestMD5Converter(){
+    private DigestMD5Converter() {
         throw new IllegalStateException("Utility class");
     }
 
     private static String hashToMD5(String... args) throws NoSuchAlgorithmException {
-        if(md==null){
+        if (md == null) {
             LOGGER.error("MessageDigest null, algorithm exception occurred");
             throw new NoSuchAlgorithmException();
         }

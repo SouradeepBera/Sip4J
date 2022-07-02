@@ -1,11 +1,11 @@
 package com.sprinklr.javasip.sip;
 
 /*
-* Defines constants for state of sip entity
+ * Defines constants for state of sip entity
  */
 public class SipState {
 
-    private SipState(){
+    private SipState() {
         throw new IllegalStateException("Utility class");
     }
 
