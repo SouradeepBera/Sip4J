@@ -14,6 +14,8 @@ import java.nio.file.Files;
  */
 public class AudioHelper {
 
+    private AudioHelper(){}
+
     /*
      * Generates an audio file from the stream. The file must be a WAV file.
      *
@@ -22,13 +24,12 @@ public class AudioHelper {
      *            written onto the file
      */
     public static void generateFile(byte[] data, File outputFile) throws IOException, UnsupportedAudioFileException {
-        AudioInputStream audioStream = getAudioStream(data);
-        if (outputFile.getName().endsWith("wav")) {
-            AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, Files.newOutputStream(outputFile.toPath()));
-        }
-        else {
+        boolean isWavFile = outputFile.getName().endsWith("wav");
+        if(!isWavFile){
             throw new IllegalArgumentException("Unsupported encoding " + outputFile);
         }
+        AudioInputStream audioStream = getAudioStream(data);
+        AudioSystem.write(audioStream, AudioFileFormat.Type.WAVE, Files.newOutputStream(outputFile.toPath()));
     }
 
     /*
@@ -97,6 +98,4 @@ public class AudioHelper {
         rawBuffer.close();
         return rawBuffer.toByteArray();
     }
-
-    private AudioHelper(){}
 }
