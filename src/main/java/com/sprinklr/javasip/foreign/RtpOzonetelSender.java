@@ -47,7 +47,7 @@ public class RtpOzonetelSender {
 
         LOGGER.info("Data length {} ", fileBytes.length);
 
-        InetAddress address = null;
+        InetAddress address;
         try {
             address = InetAddress.getByName(RTP_LOCAL_IP);
         } catch (UnknownHostException e) {

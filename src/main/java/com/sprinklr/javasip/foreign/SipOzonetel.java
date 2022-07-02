@@ -187,7 +187,7 @@ public class SipOzonetel implements SipListener, Runnable {
             }
         });
 
-        SipFactory sipFactory = null;
+        SipFactory sipFactory;
         sipStack = null;
         sipFactory = SipFactory.getInstance();
         sipFactory.setPathName("gov.nist");
