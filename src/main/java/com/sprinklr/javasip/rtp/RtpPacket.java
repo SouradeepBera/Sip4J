@@ -59,7 +59,6 @@ public class RtpPacket {
 
         //fill the payload bitstream:
         payloadSize = dataLength;
-        payload = new byte[dataLength];
 
         //fill payload array of byte from data (given in parameter of the constructor)
         payload = Arrays.copyOf(data, payloadSize);
