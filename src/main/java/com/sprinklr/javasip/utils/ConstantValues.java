@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 /*
-* Defines values which remain constant throughout
+* Define values which remain constant throughout
  */
 public class ConstantValues {
 
