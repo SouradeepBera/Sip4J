@@ -79,9 +79,10 @@ public class Sip implements SipListener, Callable<RtpAddress> {
     }
 
     @Override
-    public RtpAddress call() {
+    public RtpAddress call() throws InterruptedException {
         while(!isCallableReady){
             //wait for rtpRemoteAddress to be initialised
+            Thread.sleep(20); //sleeping for 20ms to save cpu cycles
         }
         return rtpRemoteAddress;
     }
@@ -253,7 +254,7 @@ public class Sip implements SipListener, Callable<RtpAddress> {
     public void processByeRequest(RequestEvent requestEvent, ServerTransaction serverTransaction) {
 
         Request request = requestEvent.getRequest();
-        LOGGER.info("{}} Local party = {}", agentConfig.agentName, serverTransaction.getDialog().getLocalParty());
+        LOGGER.info("{} Local party = {}", agentConfig.agentName, serverTransaction.getDialog().getLocalParty());
         try {
             LOGGER.info("{} (UAS):  got a BYE sending OK.", agentConfig.agentName);
             Response response = messageFactory.createResponse(200, request);
