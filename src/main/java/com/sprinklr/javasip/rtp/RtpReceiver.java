@@ -15,8 +15,8 @@ public class RtpReceiver implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiver.class);
     private final Queue<byte[]> inboundRtpQueue;
-    private volatile boolean exit = false;
     private final AgentConfig agentConfig;
+    private volatile boolean exit = false;
 
     public RtpReceiver(Queue<byte[]> inboundRtpQueue, AgentConfig agentConfig) {
         this.inboundRtpQueue = inboundRtpQueue;

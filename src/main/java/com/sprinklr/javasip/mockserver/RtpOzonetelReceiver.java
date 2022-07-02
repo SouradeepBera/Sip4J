@@ -22,9 +22,6 @@ import java.util.List;
 public class RtpOzonetelReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpOzonetelReceiver.class);
-    private boolean exit = false;
-    private final List<byte[]> storeRecv = new ArrayList<>();
-
     /*
     Hardcoded values, will depend on Ozonetel, set here just to mimic actual flow
      */
@@ -37,6 +34,8 @@ public class RtpOzonetelReceiver {
     /*
     Hardcoded values end
      */
+    private final List<byte[]> storeRecv = new ArrayList<>();
+    private boolean exit = false;
 
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
         new RtpOzonetelReceiver().run(RTP_REMOTE_PORT);

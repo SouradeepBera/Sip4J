@@ -11,12 +11,13 @@ import javax.sip.message.MessageFactory;
  * Singleton which initialises sip+sdp factories
  */
 public class SipAllFactories {
+
+    private static SipAllFactories singleInstance = null;
     private final SipFactory sipFactory;
     private final SdpFactory sdpFactory;
     private final AddressFactory addressFactory;
     private final MessageFactory messageFactory;
     private final HeaderFactory headerFactory;
-    private static SipAllFactories singleInstance = null;
 
     private SipAllFactories() throws PeerUnavailableException {
         sipFactory = SipFactory.getInstance();
