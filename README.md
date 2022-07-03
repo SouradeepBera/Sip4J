@@ -103,6 +103,7 @@ Ensure the port numbers are setup correctly in the mockserver package.
 
 To run it start the SpringBoot application. Start the WsBot server, SipOzonetel client and create an Agent
 by passing the agent number , which will read from the corresponding yaml file.\
+e.g. localhost:8080/agent/start/**1**\
 agent1 completes entire flow, from registration to connection to disconnection and media transfer\
 agent2 mimics an Agent which will be on standby, in registered mode.\
 agent3 mimics an Agent which remains in an unregistered state.
