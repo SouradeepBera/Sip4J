@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-/*
+/**
 Service class for Agent
  */
 @Service
@@ -27,6 +27,9 @@ public class AgentService {
     private final AgentManager agentManager;
     private final Yaml yaml;
 
+    /**
+     * Initialises the member variables. Assigns a ThreadPoolExecutor, AgentManager and Yaml for the service
+     */
     public AgentService() {
         executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         executor.setCorePoolSize(2); //set as per requirement, also add setMaximumPoolSize
@@ -34,6 +37,11 @@ public class AgentService {
         yaml = new Yaml();
     }
 
+    /**
+     * Starts agent by id
+     * @param id id of the agent to be started
+     * @throws IOException
+     */
     public void startAgent(String id) throws IOException {
         InputStream ymlStream = Files.newInputStream(Paths.get(YAML_CONFIG_DIR + "agent" + id + ".yaml"));
         AgentConfig config = yaml.loadAs(ymlStream, AgentConfig.class);
@@ -42,6 +50,10 @@ public class AgentService {
         executor.submit(agent);
     }
 
+    /**
+     * Shows statuses of all active agents
+     * @return The statuses of all active agents
+     */
     public List<String> showAllStatus() {
         List<String> statuses = new ArrayList<>();
         for (String agentName : agentManager.getNames()) {
@@ -51,6 +63,9 @@ public class AgentService {
         return statuses;
     }
 
+    /**
+     * Shuts down executor service. No more Agents can be started once this is called
+     */
     public void shutdown() {
         executor.shutdown();
     }

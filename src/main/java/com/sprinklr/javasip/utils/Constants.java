@@ -6,11 +6,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-/*
- * Define values which remain constant throughout
+/**
+ * Define values which remain constant throughout execution across all Agents
  */
 public class Constants {
 
+    /**
+     * Private constructor since it is a utility class
+     */
     private Constants() {
         throw new IllegalStateException("Utility class");
     }

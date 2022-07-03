@@ -9,18 +9,21 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-/*
+/**
  * Helper class for audio related things
  */
 public class AudioHelper {
 
     private static final String WAV_EXT = "wav";
 
+    /**
+     * Private constructor since it is a utility class
+     */
     private AudioHelper() {
         throw new IllegalStateException("Utility class");
     }
 
-    /*
+    /**
      * Generates an audio file from the stream. The file must be a WAV file.
      *
      * @param data the byte array
