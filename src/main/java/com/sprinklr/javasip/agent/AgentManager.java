@@ -15,11 +15,11 @@ public class AgentManager {
     }
 
     public void addAgent(Agent agent, AgentConfig agentConfig) {
-        agentMapper.put(agentConfig.agentName, agent);
+        agentMapper.put(agentConfig.getAgentName(), agent);
     }
 
     public Agent getAgentByConfig(AgentConfig agentConfig) {
-        return agentMapper.get(agentConfig.agentName);
+        return agentMapper.get(agentConfig.getAgentName());
     }
 
     public Agent getAgentByName(String agentName) {

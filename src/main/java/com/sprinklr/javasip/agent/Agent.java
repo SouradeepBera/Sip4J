@@ -40,7 +40,7 @@ public class Agent implements Runnable {
 
     public Agent(AgentConfig agentConfig) {
         this.agentConfig = agentConfig;
-        this.agentState = new AgentState(agentConfig.agentName);
+        this.agentState = new AgentState(agentConfig.getAgentName());
     }
 
     public void start() throws PeerUnavailableException, TransportNotSupportedException, TooManyListenersException, InvalidArgumentException, ObjectInUseException, ParseException, ExecutionException, InterruptedException, URISyntaxException {
@@ -67,7 +67,7 @@ public class Agent implements Runnable {
         RtpAddress rtpRemoteAddress;
         rtpRemoteAddress = rtpRemoteAddressFuture.get();
 
-        if (!(rtpRemoteAddress.getAddressType().equals(agentConfig.rtpAddressType)) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.rtpNetworkType))) {
+        if (!(rtpRemoteAddress.getAddressType().equals(agentConfig.getRtpAddressType())) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.getRtpNetworkType()))) {
             throw new IllegalStateException("Rtp address type or network type not matching");
         }
 
@@ -93,7 +93,7 @@ public class Agent implements Runnable {
             } catch (WebsocketNotConnectedException e) {
                 if (agentState.getWsCloseCode() == WS_RECONNECT_CODE) {
                     websocket.reconnect(); //reconnecting immediately, thread.sleep to delay
-                    LOGGER.info("Reconnecting {} to bot websocket server", agentConfig.agentName);
+                    LOGGER.info("Reconnecting {} to bot websocket server", agentConfig.getAgentName());
                 }
                 else {
                     throw new WebsocketNotConnectedException();
@@ -125,13 +125,13 @@ public class Agent implements Runnable {
         try {
             start();
         } catch (InterruptedException e) {
-            LOGGER.error("{} interrupted in Agent", agentConfig.agentName);
+            LOGGER.error("{} interrupted in Agent", agentConfig.getAgentName());
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            LOGGER.error("In Agent, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.agentName, e.getCause(), sw);
+            LOGGER.error("In Agent, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.getAgentName(), e.getCause(), sw);
         }
     }
 }

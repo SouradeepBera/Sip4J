@@ -3,17 +3,18 @@ package com.sprinklr.javasip.service;
 import com.sprinklr.javasip.agent.Agent;
 import com.sprinklr.javasip.agent.AgentConfig;
 import com.sprinklr.javasip.agent.AgentManager;
-import com.sprinklr.javasip.sip.SipState;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import static com.sprinklr.javasip.utils.Constants.SIP_ALLOWED_METHODS;
 
 /*
 Service class for Agent
@@ -21,40 +22,23 @@ Service class for Agent
 @Service
 public class AgentService {
 
-    ThreadPoolExecutor executor;
-    AgentManager agentManager;
+    private final ThreadPoolExecutor executor;
+    private final AgentManager agentManager;
+    private final Yaml yaml;
+    private final static String YAML_CONFIG_DIR = "src/main/resources/yaml/";
 
     public AgentService() {
         executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         executor.setCorePoolSize(2); //set as per requirement, also add setMaximumPoolSize
         agentManager = new AgentManager();
+        yaml = new Yaml();
     }
 
-    public void startAgent(Map<String, Object> body){
-        Map<String, String> config = new HashMap<>();
-        for (Map.Entry<String, Object> entry : body.entrySet()) {
-            config.put(entry.getKey(), (String) entry.getValue());
-        }
-
-        AgentConfig agentConfig = new AgentConfig.Builder(config.get("transportMode"), SIP_ALLOWED_METHODS, config.get("password"), config.get("agentName"))
-                .sipConfig(config.get("sipLocalIp"), Integer.parseInt(config.get("sipLocalPort")), config.get("sipLocalUsername"), config.get("sipLocalRealm"),
-                        config.get("sipLocalDisplayName"), config.get("sipRegistrarIp"), Integer.parseInt(config.get("sipRegistrarPort")), Integer.parseInt(config.get("sipRegisterExpiryTimeSec")))
-                .rtpConfig(config.get("rtpLocalIp"), Integer.parseInt(config.get("rtpLocalPort")), config.get("rtpAddressType"),
-                        config.get("rtpNetworkType"), Integer.parseInt(config.get("rtpPayloadSize")))
-                .wsConfig(config.get("wsServerUri"))
-                .build();
-
-        if(agentManager.containsAgent(agentConfig.agentName)){
-            Agent prevAgentInst = agentManager.getAgentByName(agentConfig.agentName);
-            if(!SipState.DISCONNECTED.equals(prevAgentInst.getState().getSipState())) {
-                throw new IllegalStateException("Previous instance of agent still not disconnected from call");
-            }
-            prevAgentInst.clear();
-            agentManager.removeAgentByName(agentConfig.agentName);
-        }
-
-        Agent agent = new Agent(agentConfig);
-        agentManager.addAgent(agent, agentConfig);
+    public void startAgent(String id) throws IOException {
+        InputStream ymlStream = Files.newInputStream(Paths.get(YAML_CONFIG_DIR + "agent" + id + ".yaml"));
+        AgentConfig config = yaml.loadAs(ymlStream, AgentConfig.class);
+        Agent agent = new Agent(config);
+        agentManager.addAgent(agent, config);
         executor.submit(agent);
     }
 

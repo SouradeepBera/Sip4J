@@ -22,7 +22,7 @@ public class Websocket extends WebSocketClient {
     private final AgentConfig agentConfig;
 
     public Websocket(Queue<byte[]> outboundRtpQueue, AgentState agentState, AgentConfig agentConfig) throws URISyntaxException {
-        super(new URI(agentConfig.wsServerUri));
+        super(new URI(agentConfig.getWsServerUri()));
         this.outboundRtpQueue = outboundRtpQueue;
         this.agentState = agentState;
         this.agentConfig = agentConfig;
@@ -31,7 +31,7 @@ public class Websocket extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake serverHandShake) {
         LOGGER.info("New connection opened for {} with HttpStatus:{} and HttpStatusMessage:{}",
-                agentConfig.agentName, serverHandShake.getHttpStatus(), serverHandShake.getHttpStatusMessage());
+                agentConfig.getAgentName(), serverHandShake.getHttpStatus(), serverHandShake.getHttpStatusMessage());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class Websocket extends WebSocketClient {
 
     @Override
     public void onClose(int code, String reason, boolean remote) {
-        LOGGER.info("closed {} with exit code {} additional info: {}", agentConfig.agentName, code, reason);
+        LOGGER.info("closed {} with exit code {} additional info: {}", agentConfig.getAgentName(), code, reason);
         agentState.setWsCloseCode(code);
     }
 
@@ -54,7 +54,7 @@ public class Websocket extends WebSocketClient {
     public void onError(Exception ex) {
 
         if (LOGGER.isErrorEnabled() && ex != null) {
-            LOGGER.error("Error occurred in {}: {}", agentConfig.agentName, ex.toString());
+            LOGGER.error("Error occurred in {}: {}", agentConfig.getAgentName(), ex.toString());
         }
 
     }

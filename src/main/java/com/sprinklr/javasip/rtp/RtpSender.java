@@ -41,7 +41,7 @@ public class RtpSender implements Runnable {
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
 
-            LOGGER.info("Starting rtp transmission from {}", agentConfig.agentName);
+            LOGGER.info("Starting rtp transmission from {}", agentConfig.getAgentName());
 
             while (!exit) {
                 byte[] data = outboundRtpQueue.poll(); //packet size should be correctly configured and sent from bot websocket server side
@@ -52,7 +52,7 @@ public class RtpSender implements Runnable {
                 sendBytes(remoteRtpIp, remoteRtpPort, datagramSocket, data);
             }
         }
-        LOGGER.info("Stopping rtp transmission from {}", agentConfig.agentName);
+        LOGGER.info("Stopping rtp transmission from {}", agentConfig.getAgentName());
     }
 
     private void sendBytes(InetAddress remoteRtpIp, int remoteRtpPort, DatagramSocket datagramSocket, byte[] data) throws IOException {
@@ -66,13 +66,13 @@ public class RtpSender implements Runnable {
         try {
             start();
         } catch (InterruptedException e) {
-            LOGGER.error("{} interrupted in RtpSender", agentConfig.agentName);
+            LOGGER.error("{} interrupted in RtpSender", agentConfig.getAgentName());
             Thread.currentThread().interrupt();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            LOGGER.error("In RtpSender, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.agentName, e.getCause(), sw);
+            LOGGER.error("In RtpSender, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.getAgentName(), e.getCause(), sw);
         }
     }
 

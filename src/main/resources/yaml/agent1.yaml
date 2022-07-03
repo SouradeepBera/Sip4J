@@ -1,0 +1,19 @@
+!!com.sprinklr.javasip.agent.AgentConfig2
+transportMode: udp
+password: password12345
+agentName: Agent_1
+sipLocalIp: 127.0.0.1
+sipLocalPort: '5070'
+sipLocalUsername: souradeep.bera
+sipLocalRealm: sprinklr.com
+sipLocalDisplayName: soura
+
+sipRegistrarIp: 127.0.0.1
+sipRegistrarPort: '5060'
+sipRegisterExpiryTimeSec: '3600'
+rtpLocalPort: '6022'
+rtpLocalIp: 192.168.1.8
+rtpAddressType: IP4
+rtpNetworkType: IN
+rtpPayloadSize: '256'
+wsServerUri: ws://localhost:8887

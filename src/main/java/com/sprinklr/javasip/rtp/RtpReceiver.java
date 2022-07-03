@@ -29,25 +29,25 @@ public class RtpReceiver implements Runnable {
 
     public void start() throws IOException {
 
-        InetAddress localRtpIp = InetAddress.getByName(agentConfig.rtpLocalIp);
+        InetAddress localRtpIp = InetAddress.getByName(agentConfig.getRtpLocalIp());
 
-        try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.rtpLocalPort, localRtpIp)) {
+        try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.getRtpLocalPort(), localRtpIp)) {
 
-            LOGGER.info("{} listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
+            LOGGER.info("{} listening on udp:{}:{}", agentConfig.getAgentName(), agentConfig.getRtpLocalIp(), agentConfig.getRtpLocalPort());
             serverSocket.setSoTimeout(RTP_BLOCK_SOCKET_TIME_MS); //block on receive for specified time
             while (!exit) {
                 readBytes(serverSocket);
             }
         }
-        LOGGER.info("{} stopped listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
+        LOGGER.info("{} stopped listening on udp:{}:{}", agentConfig.getAgentName(), agentConfig.getRtpLocalIp(), agentConfig.getRtpLocalPort());
     }
 
     private void readBytes(DatagramSocket serverSocket) throws IOException {
         byte[] receiveData;
         DatagramPacket receivePacket;
         try {
-            receiveData = new byte[agentConfig.rtpPacketSize];
-            receivePacket = new DatagramPacket(receiveData, agentConfig.rtpPacketSize);
+            receiveData = new byte[agentConfig.getRtpPacketSize()];
+            receivePacket = new DatagramPacket(receiveData, agentConfig.getRtpPacketSize());
             serverSocket.receive(receivePacket);
 
             inboundRtpQueue.offer(receivePacket.getData());
@@ -64,7 +64,7 @@ public class RtpReceiver implements Runnable {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            LOGGER.error("In RtpReceiver, {} alert! IOException: {}", agentConfig.agentName, sw);
+            LOGGER.error("In RtpReceiver, {} alert! IOException: {}", agentConfig.getAgentName(), sw);
         }
     }
 

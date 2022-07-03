@@ -95,10 +95,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         this.headerFactory = sipAllFactories.getHeaderFactory();
 
         Properties properties = new Properties();
-        properties.setProperty("javax.sip.STACK_NAME", agentConfig.agentName);
+        properties.setProperty("javax.sip.STACK_NAME", agentConfig.getAgentName());
         sipStack = sipFactory.createSipStack(properties);
 
-        ListeningPoint listeningPoint = sipStack.createListeningPoint(agentConfig.sipLocalIp, agentConfig.sipLocalPort, agentConfig.transportMode);
+        ListeningPoint listeningPoint = sipStack.createListeningPoint(agentConfig.getSipLocalIp(), agentConfig.getSipLocalPort(), agentConfig.getTransportMode());
         sipProvider = sipStack.createSipProvider(listeningPoint);
         sipProvider.addSipListener(this);
 
@@ -111,7 +111,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         //re-registers to prevent expiry
         timer.scheduleAtFixedRate(sendRegisterRequestTask,
                 0,      // run first occurrence immediately
-                TimeUnit.SECONDS.toMillis(agentConfig.sipRegisterExpiryTimeSec / 2)); // run every REGISTER_EXPIRY_TIME/2 seconds
+                TimeUnit.SECONDS.toMillis(agentConfig.getSipRegisterExpiryTimeSec() / 2)); // run every REGISTER_EXPIRY_TIME/2 seconds
     }
 
     @Override
@@ -133,10 +133,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
                 ClientTransaction registerTransaction = sipProvider.getNewClientTransaction(registerRequest);
                 //send the request
                 registerTransaction.sendRequest();
-                LOGGER.info("{} sent REGISTER request", agentConfig.agentName);
+                LOGGER.info("{} sent REGISTER request", agentConfig.getAgentName());
             } catch (Exception ex) {
                 agentState.setSipState(SipState.REGISTRATION_FAILED);
-                LOGGER.error("Error while sending REGISTER request in {}: {}", agentConfig.agentName, ex.toString());
+                LOGGER.error("Error while sending REGISTER request in {}: {}", agentConfig.getAgentName(), ex.toString());
             }
         }
     }
@@ -166,7 +166,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
                 processCancelRequest(requestEvent, serverTransaction);
                 break;
             default:
-                LOGGER.warn("Request method not supported, not processing in {}", agentConfig.agentName);
+                LOGGER.warn("Request method not supported, not processing in {}", agentConfig.getAgentName());
         }
     }
 
@@ -178,14 +178,14 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         Response response = responseEvent.getResponse();
         CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
-        LOGGER.info("{} received a response: Status Code = {} {}", agentConfig.agentName, response.getStatusCode(), cseq);
+        LOGGER.info("{} received a response: Status Code = {} {}", agentConfig.getAgentName(), response.getStatusCode(), cseq);
         if (cseq == null) {
-            LOGGER.warn("Empty cseq header, response not processed in {}", agentConfig.agentName);
+            LOGGER.warn("Empty cseq header, response not processed in {}", agentConfig.getAgentName());
             return;
         }
 
         if (!Request.REGISTER.equals(cseq.getMethod())) {
-            LOGGER.error("Not a response for REGISTER request, not processing response in {}", agentConfig.agentName);
+            LOGGER.error("Not a response for REGISTER request, not processing response in {}", agentConfig.getAgentName());
             return;
         }
 
@@ -199,19 +199,19 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         if (response.getStatusCode() == Response.OK) {
             agentState.setSipState(SipState.REGISTERED);
         } else if (response.getStatusCode() == Response.UNAUTHORIZED) {
-            LOGGER.info("Received {} for REGISTER request, resending from {}", Response.UNAUTHORIZED, agentConfig.agentName);
+            LOGGER.info("Received {} for REGISTER request, resending from {}", Response.UNAUTHORIZED, agentConfig.getAgentName());
             try {
                 Request newRegisterRequest = sipRequestCreator.createRegisterRequestWithCredentials(response);
                 ClientTransaction registerTransaction = sipProvider.getNewClientTransaction(newRegisterRequest); //resending REGISTER request with credentials
                 registerTransaction.sendRequest();
 
             } catch (ParseException | InvalidArgumentException | NoSuchAlgorithmException | SipException e) {
-                LOGGER.error("Exception while authenticating REGISTER request in {}: {}", agentConfig.agentName, e.toString());
+                LOGGER.error("Exception while authenticating REGISTER request in {}: {}", agentConfig.getAgentName(), e.toString());
                 agentState.setSipState(SipState.REGISTRATION_FAILED);
             }
 
         } else {
-            LOGGER.error("No 200 or 401 received for REGISTER in {}, some error has occurred", agentConfig.agentName);
+            LOGGER.error("No 200 or 401 received for REGISTER in {}, some error has occurred", agentConfig.getAgentName());
             agentState.setSipState(SipState.REGISTRATION_FAILED);
         }
     }
@@ -220,11 +220,11 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
      Process the ACK request, acting as UAS
      */
     public void processAckRequest(ServerTransaction serverTransaction) {
-        LOGGER.info("{} (UAS): got an ACK! ", agentConfig.agentName);
+        LOGGER.info("{} (UAS): got an ACK! ", agentConfig.getAgentName());
         if (serverTransaction.getDialog() == null) {
-            LOGGER.info("Dialog for {} is null", agentConfig.agentName);
+            LOGGER.info("Dialog for {} is null", agentConfig.getAgentName());
         } else {
-            LOGGER.info("Dialog State in {} = {}", agentConfig.agentName, serverTransaction.getDialog().getState());
+            LOGGER.info("Dialog State in {} = {}", agentConfig.getAgentName(), serverTransaction.getDialog().getState());
         }
     }
 
@@ -239,11 +239,11 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
             return;
 
         try {
-            LOGGER.info("{} (UAS) sending TRYING", agentConfig.agentName);
+            LOGGER.info("{} (UAS) sending TRYING", agentConfig.getAgentName());
             Response tryingResponse = messageFactory.createResponse(Response.RINGING, request);
 
             if (serverTransaction == null) {
-                LOGGER.info("Found null serverTransaction while processing INVITE, creating from Sip Provider in {}", agentConfig.agentName);
+                LOGGER.info("Found null serverTransaction while processing INVITE, creating from Sip Provider in {}", agentConfig.getAgentName());
                 serverTransaction = sipProvider.getNewServerTransaction(request);
             }
 
@@ -253,8 +253,8 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
             Response okResponse = messageFactory.createResponse(Response.OK, request);
             //Contact Header is mandatory for the OK to the INVITE
-            SipURI contactURI = addressFactory.createSipURI(agentConfig.sipLocalUsername, agentConfig.sipLocalIp + ":" + agentConfig.sipLocalPort);
-            Address contactAddress = addressFactory.createAddress(agentConfig.sipLocalDisplayName, contactURI);
+            SipURI contactURI = addressFactory.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
+            Address contactAddress = addressFactory.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
             ContactHeader contactHeader = headerFactory.createContactHeader(contactAddress);
             okResponse.addHeader(contactHeader);
             this.inviteServerTransaction = serverTransaction;
@@ -263,24 +263,24 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
             this.inviteRequest = request;
 
             if (inviteServerTransaction.getState() != TransactionState.COMPLETED) {
-                LOGGER.info("Dialog state in {} before 200: {}", agentConfig.agentName, inviteServerTransaction.getDialog().getState());
+                LOGGER.info("Dialog state in {} before 200: {}", agentConfig.getAgentName(), inviteServerTransaction.getDialog().getState());
                 inviteServerTransaction.sendResponse(okResponse);
 
-                LOGGER.info("Dialog state in {} after 200: {}", agentConfig.agentName, inviteServerTransaction.getDialog().getState());
+                LOGGER.info("Dialog state in {} after 200: {}", agentConfig.getAgentName(), inviteServerTransaction.getDialog().getState());
 
                 SessionDescription remoteSdp = extractSDP(requestEvent);
                 Media media = extractMedia(remoteSdp);
                 Connection connection = extractConnection(remoteSdp);
                 rtpRemoteAddress = new RtpAddress(media.getMediaPort(), connection.getAddress(), connection.getAddressType(), connection.getNetworkType());
                 isCallableReady = true;
-                LOGGER.info("{} set remote rtp address for Agent", agentConfig.agentName);
+                LOGGER.info("{} set remote rtp address for Agent", agentConfig.getAgentName());
 
                 agentState.setSipState(SipState.CONNECTED);
             }
 
         } catch (Exception ex) {
             agentState.setSipState(SipState.DISCONNECTED);
-            LOGGER.error("Error while processing INVITE request in {}: {}", agentConfig.agentName, ex.toString());
+            LOGGER.error("Error while processing INVITE request in {}: {}", agentConfig.getAgentName(), ex.toString());
         }
     }
 
@@ -290,19 +290,19 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     public void processByeRequest(RequestEvent requestEvent, ServerTransaction serverTransaction) {
 
         Request request = requestEvent.getRequest();
-        LOGGER.info("{} Local party = {}", agentConfig.agentName, serverTransaction.getDialog().getLocalParty());
+        LOGGER.info("{} Local party = {}", agentConfig.getAgentName(), serverTransaction.getDialog().getLocalParty());
         try {
-            LOGGER.info("{} (UAS):  got a BYE sending OK.", agentConfig.agentName);
+            LOGGER.info("{} (UAS):  got a BYE sending OK.", agentConfig.getAgentName());
             Response response = messageFactory.createResponse(200, request);
             serverTransaction.sendResponse(response);
 
             agentState.setSipState(SipState.DISCONNECTED);
 
-            LOGGER.info("Dialog State in {} is {}", agentConfig.agentName, serverTransaction.getDialog().getState());
+            LOGGER.info("Dialog State in {} is {}", agentConfig.getAgentName(), serverTransaction.getDialog().getState());
             shutDown();
         } catch (Exception ex) {
             agentState.setSipState(SipState.DISCONNECTED);
-            LOGGER.error("Error while processing BYE request in {}: {}", agentConfig.agentName, ex.toString());
+            LOGGER.error("Error while processing BYE request in {}: {}", agentConfig.getAgentName(), ex.toString());
         }
     }
 
@@ -314,9 +314,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
         Request request = requestEvent.getRequest();
         try {
-            LOGGER.info("{} (UAS) got a CANCEL", agentConfig.agentName);
+            LOGGER.info("{} (UAS) got a CANCEL", agentConfig.getAgentName());
             if (serverTransaction == null) {
-                LOGGER.warn("Received null serverTransaction in {}, treating as stray response", agentConfig.agentName);
+                LOGGER.warn("Received null serverTransaction in {}, treating as stray response", agentConfig.getAgentName());
                 return;
             }
             Response response = messageFactory.createResponse(Response.OK, request);
@@ -331,7 +331,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
             }
         } catch (Exception ex) {
             agentState.setSipState(SipState.DISCONNECTED);
-            LOGGER.error("Error while processing CANCEL request in {} : {}", agentConfig.agentName, ex.toString());
+            LOGGER.error("Error while processing CANCEL request in {} : {}", agentConfig.getAgentName(), ex.toString());
         }
     }
 
@@ -342,41 +342,41 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         } else {
             transaction = timeoutEvent.getClientTransaction();
         }
-        LOGGER.warn("Transaction Timeout event received for {}", agentConfig.agentName);
-        LOGGER.info("{} state = {}", agentConfig.agentName, transaction.getState());
-        LOGGER.info("{} dialog = {}", agentConfig.agentName, transaction.getDialog());
+        LOGGER.warn("Transaction Timeout event received for {}", agentConfig.getAgentName());
+        LOGGER.info("{} state = {}", agentConfig.getAgentName(), transaction.getState());
+        LOGGER.info("{} dialog = {}", agentConfig.getAgentName(), transaction.getDialog());
         if (transaction.getDialog() != null) {
-            LOGGER.info("{} dialogState = {}", agentConfig.agentName, transaction.getDialog().getState());
+            LOGGER.info("{} dialogState = {}", agentConfig.getAgentName(), transaction.getDialog().getState());
         }
     }
 
     public void processIOException(IOExceptionEvent exceptionEvent) {
-        LOGGER.error("IOException event received for {}, host:{} and port:{}", agentConfig.agentName, exceptionEvent.getHost(), exceptionEvent.getPort());
+        LOGGER.error("IOException event received for {}, host:{} and port:{}", agentConfig.getAgentName(), exceptionEvent.getHost(), exceptionEvent.getPort());
     }
 
     public void processTransactionTerminated(TransactionTerminatedEvent transactionTerminatedEvent) {
         if (transactionTerminatedEvent.isServerTransaction())
-            LOGGER.info("Transaction(as server) terminated event received for {}: {}", agentConfig.agentName, transactionTerminatedEvent.getServerTransaction());
+            LOGGER.info("Transaction(as server) terminated event received for {}: {}", agentConfig.getAgentName(), transactionTerminatedEvent.getServerTransaction());
         else
-            LOGGER.info("Transaction(as client) terminated event received for {}: {}", agentConfig.agentName, transactionTerminatedEvent.getClientTransaction());
+            LOGGER.info("Transaction(as client) terminated event received for {}: {}", agentConfig.getAgentName(), transactionTerminatedEvent.getClientTransaction());
     }
 
     public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
-        LOGGER.info("{} received dialog terminated event", agentConfig.agentName);
+        LOGGER.info("{} received dialog terminated event", agentConfig.getAgentName());
         Dialog d = dialogTerminatedEvent.getDialog();
         LOGGER.info("Local Party = {}", d.getLocalParty());
     }
 
     private void shutDown() {
-        LOGGER.info("nulling server references for {}", agentConfig.agentName);
+        LOGGER.info("nulling server references for {}", agentConfig.getAgentName());
         sipStack.stop();
         inviteServerTransaction = null;
         inviteRequest = null;
         //cancel registration task running at regular intervals
-        LOGGER.info("Cancelling registration task for {}: {}", agentConfig.agentName, sendRegisterRequestTask.cancel());
+        LOGGER.info("Cancelling registration task for {}: {}", agentConfig.getAgentName(), sendRegisterRequestTask.cancel());
         timer.cancel();
-        LOGGER.info("Cancelling timer for {}", agentConfig.agentName);
-        LOGGER.info("Server shutdown in {}", agentConfig.agentName);
+        LOGGER.info("Cancelling timer for {}", agentConfig.getAgentName());
+        LOGGER.info("Server shutdown in {}", agentConfig.getAgentName());
     }
 
     public SessionDescription extractSDP(RequestEvent requestEvent) throws SdpParseException {

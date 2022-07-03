@@ -28,6 +28,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import static com.sprinklr.javasip.utils.Constants.SIP_ALLOWED_METHODS;
+
 /*
  * Helper class which creates requests
  */
@@ -46,27 +48,27 @@ public class SipRequestCreator {
         this.addressFactory = addressFactory;
         this.messageFactory = messageFactory;
         this.headerFactory = headerFactory;
-        this.listeningPoint = sipProvider.getListeningPoint(agentConfig.transportMode);
+        this.listeningPoint = sipProvider.getListeningPoint(agentConfig.getTransportMode());
         this.agentConfig = agentConfig;
     }
 
     public Request createRegisterRequest() throws ParseException, InvalidArgumentException {
         //create from header
-        SipURI fromAddress = addressFactory.createSipURI(agentConfig.sipLocalUsername, agentConfig.sipLocalRealm);
-        Address fromNameAddress = addressFactory.createAddress(agentConfig.sipLocalDisplayName, fromAddress);
-        FromHeader fromHeader = headerFactory.createFromHeader(fromNameAddress, agentConfig.sipLocalTag);
+        SipURI fromAddress = addressFactory.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
+        Address fromNameAddress = addressFactory.createAddress(agentConfig.getSipLocalDisplayName(), fromAddress);
+        FromHeader fromHeader = headerFactory.createFromHeader(fromNameAddress, agentConfig.getSipLocalTag());
 
         // create to Header
-        SipURI toAddress = addressFactory.createSipURI(agentConfig.sipLocalUsername, agentConfig.sipLocalRealm);
-        Address toNameAddress = addressFactory.createAddress(agentConfig.sipLocalDisplayName, toAddress);
+        SipURI toAddress = addressFactory.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
+        Address toNameAddress = addressFactory.createAddress(agentConfig.getSipLocalDisplayName(), toAddress);
         ToHeader toHeader = headerFactory.createToHeader(toNameAddress, null);
 
         // create Register URI
-        SipURI registerURI = addressFactory.createSipURI(null, agentConfig.sipRegistrarIp + ":" + agentConfig.sipRegistrarPort); //The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
+        SipURI registerURI = addressFactory.createSipURI(null, agentConfig.getSipRegistrarIp() + ":" + agentConfig.getSipRegistrarPort()); //The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
 
         // Create ViaHeaders
         ArrayList<ViaHeader> viaHeaders = new ArrayList<>();
-        ViaHeader viaHeader = headerFactory.createViaHeader(listeningPoint.getIPAddress(), listeningPoint.getPort(), agentConfig.transportMode, null);
+        ViaHeader viaHeader = headerFactory.createViaHeader(listeningPoint.getIPAddress(), listeningPoint.getPort(), agentConfig.getTransportMode(), null);
         // add via headers
         viaHeaders.add(viaHeader);
 
@@ -86,18 +88,18 @@ public class SipRequestCreator {
 
         // Create Contact header after creating the contact address.
         //where to contact, differs from FROM header, refer https://stackoverflow.com/questions/31034422/what-is-the-difference-in-contact-and-from-header
-        SipURI contactURI = addressFactory.createSipURI(agentConfig.sipLocalUsername, agentConfig.sipLocalIp + ":" + agentConfig.sipLocalPort);
-        Address contactAddress = addressFactory.createAddress(agentConfig.sipLocalDisplayName, contactURI);
+        SipURI contactURI = addressFactory.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
+        Address contactAddress = addressFactory.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
         ContactHeader contactHeader = headerFactory.createContactHeader(contactAddress);
         request.addHeader(contactHeader);
 
         // Create Allow header
         AllowList allowList = new AllowList();
-        allowList.setMethods(agentConfig.sipAllowedMethods);
+        allowList.setMethods(SIP_ALLOWED_METHODS);
         request.addHeader(allowList);
 
         // Create an Expires header
-        ExpiresHeader expiresHeader = headerFactory.createExpiresHeader(agentConfig.sipRegisterExpiryTimeSec);
+        ExpiresHeader expiresHeader = headerFactory.createExpiresHeader(agentConfig.getSipRegisterExpiryTimeSec());
         request.addHeader(expiresHeader);
 
         return request;
@@ -112,9 +114,9 @@ public class SipRequestCreator {
         Request newRequest = createRegisterRequest();
         CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
         newRequest.setHeader(oldCallIdHeader); //All registrations from a UAC SHOULD use the same Call-ID header field value for registrations sent to a particular registrar
-        String userName = agentConfig.sipLocalUsername;
+        String userName = agentConfig.getSipLocalUsername();
         String realm = wwwAuthenticateHeader.getRealm();
-        String password = agentConfig.password;
+        String password = agentConfig.getPassword();
         String method = Request.REGISTER;
         String uri = newRequest.getRequestURI().toString();
         String nonce = wwwAuthenticateHeader.getNonce();
