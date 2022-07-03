@@ -26,7 +26,7 @@ public class AgentService {
 
     public AgentService() {
         executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        executor.setCorePoolSize(2);
+        executor.setCorePoolSize(2); //set as per requirement, also add setMaximumPoolSize
         agentManager = new AgentManager();
     }
 
