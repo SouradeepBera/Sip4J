@@ -31,7 +31,7 @@ back to Ozonetel using the RTP session.
 
 An agent configuration is created using the ```AgentConfig``` class. It can be created in multiple ways
 , from a Json passed in a POST request to run an Agent or internally from config files.
-If there are passwords or sensitive information, internal config files can be used.
+If there are passwords or sensitive information, internal config files should be preferred.
 
 ---
 
@@ -102,7 +102,13 @@ the same file after passing it through all the components.
 Ensure the port numbers are setup correctly in the mockserver package.
 
 To run it start the SpringBoot application. Start the WsBot server, SipOzonetel client and create an Agent
-by passing the config in the POST body like so
+by passing the agent number , which will read from the corresponding yaml file.\
+agent1 completes entire flow, from registration to connection to disconnection and media transfer\
+agent2 mimics an Agent which will be on standby, in registered mode.\
+agent3 mimics an Agent which remains in an unregistered state.
+
+
+The equivalent of the agent1.yaml file in json, which could be passed from a POST request is shown as below
 ```json
 {
   "transportMode":"udp", 
@@ -121,7 +127,7 @@ by passing the config in the POST body like so
   "rtpNetworkType":"IN",
   "rtpPayloadSize":"256",
   "wsServerUri":"ws://localhost:8887",
-  "password":"password12345",
+  "password":"password12345"
 }
 ```
 
