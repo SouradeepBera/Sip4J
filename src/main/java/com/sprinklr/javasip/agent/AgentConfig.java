@@ -1,174 +1,204 @@
 package com.sprinklr.javasip.agent;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 import static com.sprinklr.javasip.utils.Constants.RTP_HEADER_SIZE;
 
-/*
- * Configuration for Agent
- */
 public class AgentConfig {
 
-    public final String agentName;
-    public final String transportMode;
+    private String getAgentName;
+    private String transportMode;
 
     /*
     ---------------------------------------------- SIP CONFIG ------------------------------------------------
      */
 
-    public final String sipLocalIp;
-    public final int sipLocalPort;
-    public final String sipLocalUsername;
-    public final String sipLocalRealm;
-    public final String sipLocalDisplayName;
+    private String sipLocalIp;
+    private int sipLocalPort;
+    private String sipLocalUsername;
+    private String sipLocalRealm;
+    private String sipLocalDisplayName;
 
-    public final String sipRegistrarIp;
-    public final int sipRegistrarPort;
+    private String sipRegistrarIp;
+    private int sipRegistrarPort;
 
-    public final int sipRegisterExpiryTimeSec;
-    public final List<String> sipAllowedMethods;
-    public final String sipLocalTag;
+    private int sipRegisterExpiryTimeSec;
+    private final String sipLocalTag = UUID.randomUUID().toString();
 
     /*
     ---------------------------------------------- RTP CONFIG ------------------------------------------------
      */
 
-    public final int rtpLocalPort;
-    public final String rtpLocalIp;
+    private int rtpLocalPort;
+    private String rtpLocalIp;
 
-    public final String rtpAddressType;
-    public final String rtpNetworkType;
+    private String rtpAddressType;
+    private String rtpNetworkType;
 
-    public final int rtpPayloadSize;
-    public final int rtpPacketSize;
+    private int rtpPayloadSize;
+    private int rtpPacketSize;
 
     /*
     ---------------------------------------------- WEBSOCKET CONFIG ------------------------------------------------
      */
 
-    public final String wsServerUri;
+    private String wsServerUri;
 
 
     /*
     ---------------------------------------------- MISC CONFIG ------------------------------------------------
      */
-    public final String password;
+    private String password;
 
-    public static class Builder {
-
-        private final String agentName;
-        private final String transportMode;
-        private final String password;
-
-        private String sipLocalIp;
-        private int sipLocalPort;
-        private String sipLocalUsername;
-        private String sipLocalRealm;
-        private String sipLocalDisplayName;
-
-        private String sipRegistrarIp;
-        private int sipRegistrarPort;
-
-        private int sipRegisterExpiryTimeSec;
-        private final List<String> sipAllowedMethods;
-
-
-        private int rtpLocalPort;
-        private String rtpLocalIp;
-
-        private String rtpAddressType;
-        private String rtpNetworkType;
-        private int rtpPayloadSize;
-        private int rtpPacketSize;
-
-        private String wsServerUri;
-
-
-        public Builder(String transportMode, List<String> sipAllowedMethods, String password, String agentName) {
-            this.transportMode = transportMode;
-            this.sipAllowedMethods = sipAllowedMethods;
-            this.password = password;
-            this.agentName = agentName;
-        }
-
-        public Builder sipConfig(String sipLocalIp, int sipLocalPort, String sipLocalUsername, String sipLocalRealm, String sipLocalDisplayName, String sipRegistrarIp, int sipRegistrarPort, int sipRegisterExpiryTimeSec) {
-            this.sipLocalIp = sipLocalIp;
-            this.sipLocalPort = sipLocalPort;
-            this.sipLocalUsername = sipLocalUsername;
-            this.sipLocalRealm = sipLocalRealm;
-            this.sipLocalDisplayName = sipLocalDisplayName;
-            this.sipRegistrarIp = sipRegistrarIp;
-            this.sipRegistrarPort = sipRegistrarPort;
-            this.sipRegisterExpiryTimeSec = sipRegisterExpiryTimeSec;
-            return this;
-        }
-
-        public Builder rtpConfig(String rtpLocalIp, int rtpLocalPort, String rtpAddressType, String rtpNetworkType, int rtpPayloadSize) {
-            this.rtpLocalIp = rtpLocalIp;
-            this.rtpLocalPort = rtpLocalPort;
-            this.rtpAddressType = rtpAddressType;
-            this.rtpNetworkType = rtpNetworkType;
-            this.rtpPayloadSize = rtpPayloadSize;
-            this.rtpPacketSize = RTP_HEADER_SIZE + rtpPayloadSize;
-            return this;
-        }
-
-        public Builder wsConfig(String wsServerUri) {
-            this.wsServerUri = wsServerUri;
-            return this;
-        }
-
-        public AgentConfig build() {
-            return new AgentConfig(this);
-        }
+    public String getAgentName() {
+        return getAgentName;
     }
 
-    private AgentConfig(Builder builder) {
-        agentName = builder.agentName;
-        transportMode = builder.transportMode;
-
-        sipLocalIp = builder.sipLocalIp;
-        sipLocalPort = builder.sipLocalPort;
-        sipLocalRealm = builder.sipLocalRealm;
-        sipLocalUsername = builder.sipLocalUsername;
-        sipLocalDisplayName = builder.sipLocalDisplayName;
-        sipRegistrarIp = builder.sipRegistrarIp;
-        sipRegistrarPort = builder.sipRegistrarPort;
-        sipRegisterExpiryTimeSec = builder.sipRegisterExpiryTimeSec;
-        sipAllowedMethods = builder.sipAllowedMethods;
-        sipLocalTag = UUID.randomUUID().toString();
-
-        rtpLocalIp = builder.rtpLocalIp;
-        rtpLocalPort = builder.rtpLocalPort;
-        rtpAddressType = builder.rtpAddressType;
-        rtpNetworkType = builder.rtpNetworkType;
-        rtpPayloadSize = builder.rtpPayloadSize;
-        rtpPacketSize = builder.rtpPacketSize;
-
-        wsServerUri = builder.wsServerUri;
-
-        password = builder.password;
+    public void setAgentName(String agentName) {
+        this.getAgentName = agentName;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AgentConfig that = (AgentConfig) o;
-        return sipLocalPort == that.sipLocalPort && sipRegistrarPort == that.sipRegistrarPort && sipRegisterExpiryTimeSec == that.sipRegisterExpiryTimeSec && rtpLocalPort == that.rtpLocalPort && rtpPayloadSize == that.rtpPayloadSize && rtpPacketSize == that.rtpPacketSize && agentName.equals(that.agentName) && transportMode.equals(that.transportMode) && sipLocalIp.equals(that.sipLocalIp) && sipLocalUsername.equals(that.sipLocalUsername) && sipLocalRealm.equals(that.sipLocalRealm) && sipLocalDisplayName.equals(that.sipLocalDisplayName) && sipRegistrarIp.equals(that.sipRegistrarIp) && sipAllowedMethods.equals(that.sipAllowedMethods) && sipLocalTag.equals(that.sipLocalTag) && rtpLocalIp.equals(that.rtpLocalIp) && rtpAddressType.equals(that.rtpAddressType) && rtpNetworkType.equals(that.rtpNetworkType) && wsServerUri.equals(that.wsServerUri) && password.equals(that.password);
+    public String getTransportMode() {
+        return transportMode;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(agentName, transportMode, sipLocalIp, sipLocalPort, sipLocalUsername, sipLocalRealm, sipLocalDisplayName, sipRegistrarIp, sipRegistrarPort, sipRegisterExpiryTimeSec, sipAllowedMethods, sipLocalTag, rtpLocalPort, rtpLocalIp, rtpAddressType, rtpNetworkType, rtpPayloadSize, rtpPacketSize, wsServerUri, password);
+    public void setTransportMode(String transportMode) {
+        this.transportMode = transportMode;
+    }
+
+    public String getSipLocalIp() {
+        return sipLocalIp;
+    }
+
+    public void setSipLocalIp(String sipLocalIp) {
+        this.sipLocalIp = sipLocalIp;
+    }
+
+    public int getSipLocalPort() {
+        return sipLocalPort;
+    }
+
+    public void setSipLocalPort(int sipLocalPort) {
+        this.sipLocalPort = sipLocalPort;
+    }
+
+    public String getSipLocalUsername() {
+        return sipLocalUsername;
+    }
+
+    public void setSipLocalUsername(String sipLocalUsername) {
+        this.sipLocalUsername = sipLocalUsername;
+    }
+
+    public String getSipLocalRealm() {
+        return sipLocalRealm;
+    }
+
+    public void setSipLocalRealm(String sipLocalRealm) {
+        this.sipLocalRealm = sipLocalRealm;
+    }
+
+    public String getSipLocalDisplayName() {
+        return sipLocalDisplayName;
+    }
+
+    public void setSipLocalDisplayName(String sipLocalDisplayName) {
+        this.sipLocalDisplayName = sipLocalDisplayName;
+    }
+
+    public String getSipRegistrarIp() {
+        return sipRegistrarIp;
+    }
+
+    public void setSipRegistrarIp(String sipRegistrarIp) {
+        this.sipRegistrarIp = sipRegistrarIp;
+    }
+
+    public int getSipRegistrarPort() {
+        return sipRegistrarPort;
+    }
+
+    public void setSipRegistrarPort(int sipRegistrarPort) {
+        this.sipRegistrarPort = sipRegistrarPort;
+    }
+
+    public int getSipRegisterExpiryTimeSec() {
+        return sipRegisterExpiryTimeSec;
+    }
+
+    public void setSipRegisterExpiryTimeSec(int sipRegisterExpiryTimeSec) {
+        this.sipRegisterExpiryTimeSec = sipRegisterExpiryTimeSec;
+    }
+
+    public String getSipLocalTag() {
+        return sipLocalTag;
+    }
+
+    public int getRtpLocalPort() {
+        return rtpLocalPort;
+    }
+
+    public void setRtpLocalPort(int rtpLocalPort) {
+        this.rtpLocalPort = rtpLocalPort;
+    }
+
+    public String getRtpLocalIp() {
+        return rtpLocalIp;
+    }
+
+    public void setRtpLocalIp(String rtpLocalIp) {
+        this.rtpLocalIp = rtpLocalIp;
+    }
+
+    public String getRtpAddressType() {
+        return rtpAddressType;
+    }
+
+    public void setRtpAddressType(String rtpAddressType) {
+        this.rtpAddressType = rtpAddressType;
+    }
+
+    public String getRtpNetworkType() {
+        return rtpNetworkType;
+    }
+
+    public void setRtpNetworkType(String rtpNetworkType) {
+        this.rtpNetworkType = rtpNetworkType;
+    }
+
+    public int getRtpPayloadSize() {
+        return rtpPayloadSize;
+    }
+
+    public void setRtpPayloadSize(int rtpPayloadSize) {
+        this.rtpPayloadSize = rtpPayloadSize;
+        this.rtpPacketSize = RTP_HEADER_SIZE + rtpPayloadSize;
+    }
+
+    public int getRtpPacketSize() {
+        return rtpPacketSize;
+    }
+
+    public String getWsServerUri() {
+        return wsServerUri;
+    }
+
+    public void setWsServerUri(String wsServerUri) {
+        this.wsServerUri = wsServerUri;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String toString() {
-        return "AgentConfig{" +
-                "agentName='" + agentName + '\'' +
+        return "AgentConfig2{" +
+                "agentName='" + getAgentName + '\'' +
                 ", transportMode='" + transportMode + '\'' +
                 ", sipLocalIp='" + sipLocalIp + '\'' +
                 ", sipLocalPort=" + sipLocalPort +
@@ -178,7 +208,6 @@ public class AgentConfig {
                 ", sipRegistrarIp='" + sipRegistrarIp + '\'' +
                 ", sipRegistrarPort=" + sipRegistrarPort +
                 ", sipRegisterExpiryTimeSec=" + sipRegisterExpiryTimeSec +
-                ", sipAllowedMethods=" + sipAllowedMethods +
                 ", sipLocalTag='" + sipLocalTag + '\'' +
                 ", rtpLocalPort=" + rtpLocalPort +
                 ", rtpLocalIp='" + rtpLocalIp + '\'' +
