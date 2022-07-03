@@ -12,7 +12,7 @@ import java.util.Queue;
 
 import static com.sprinklr.javasip.utils.Constants.RTP_BLOCK_SOCKET_TIME_MS;
 
-/*
+/**
  * Agent's RTP receiver which receives data packets from Ozonetel in RTP session
  */
 public class RtpReceiver implements Runnable {
@@ -22,11 +22,20 @@ public class RtpReceiver implements Runnable {
     private final AgentConfig agentConfig;
     private volatile boolean exit = false;
 
+    /**
+     * Instantiates the RtpReceiver entity of an Agent
+     * @param inboundRtpQueue The queue where the received Rtp packets are stored
+     * @param agentConfig The configuration the Agent to whom this RtpReceiver entity belongs
+     */
     public RtpReceiver(Queue<byte[]> inboundRtpQueue, AgentConfig agentConfig) {
         this.inboundRtpQueue = inboundRtpQueue;
         this.agentConfig = agentConfig;
     }
 
+    /**
+     * Starts listening at the specified port and address for Rtp Packets
+     * @throws IOException
+     */
     public void start() throws IOException {
 
         InetAddress localRtpIp = InetAddress.getByName(agentConfig.getRtpLocalIp());
@@ -42,6 +51,11 @@ public class RtpReceiver implements Runnable {
         LOGGER.info("{} stopped listening on udp:{}:{}", agentConfig.getAgentName(), agentConfig.getRtpLocalIp(), agentConfig.getRtpLocalPort());
     }
 
+    /**
+     * Helper function which receives the incoming packets and pushes them into the inboound queue
+     * @param serverSocket the DatagramSocket which listens for Rtp Packets
+     * @throws IOException
+     */
     private void readBytes(DatagramSocket serverSocket) throws IOException {
         byte[] receiveData;
         DatagramPacket receivePacket;
@@ -56,6 +70,9 @@ public class RtpReceiver implements Runnable {
         }
     }
 
+    /**
+     * Overridden method of Runnable which starts this on a new thread
+     */
     @Override
     public void run() {
         try {
@@ -68,6 +85,9 @@ public class RtpReceiver implements Runnable {
         }
     }
 
+    /**
+     * Stops the listener
+     */
     public void stop() {
         exit = true;
     }

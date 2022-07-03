@@ -2,7 +2,7 @@ package com.sprinklr.javasip.rtp;
 
 import java.util.Objects;
 
-/*
+/**
  * Describes a complete RTP address
  */
 public class RtpAddress {
@@ -12,6 +12,13 @@ public class RtpAddress {
     private final String addressType;
     private final String networkType;
 
+    /**
+     * Creates a complete RTP address
+     * @param port the RTP port
+     * @param address the RTP IP address
+     * @param addressType the type of IP address (e.g. IP4 or IP6)
+     * @param networkType the network type utilised
+     */
     public RtpAddress(int port, String address, String addressType, String networkType) {
         this.port = port;
         this.address = address;

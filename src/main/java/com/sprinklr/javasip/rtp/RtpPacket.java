@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import static com.sprinklr.javasip.utils.Constants.RTP_HEADER_SIZE;
 
-/*
+/**
 RTP Packet transported between RTP endpoints
  */
 public class RtpPacket {
@@ -28,9 +28,16 @@ public class RtpPacket {
     //Bitstream of the RTP payload
     private byte[] payload;
 
-    //--------------------------
-    //Constructor of an RTPpacket object from header fields and payload bitstream
-    //--------------------------
+    /**
+     * Constructor of an RTPpacket object from header fields and the payload
+     * @param payloadType This field identifies the format of the RTP payload and determines its interpretation by the application.
+     * @param sequenceNumber The sequence number increments by one for each RTP data packet sent, and may be used by the receiver to detect packet loss and to restore packet sequence.
+     * @param timeStamp The timestamp reflects the sampling instant of the first octet in the RTP data packet.
+     * @param ssrc The source of a stream of RTP packets, identified by a 32-bit numeric SSRC identifier
+     * @param marker The interpretation of the marker is defined by a profile.
+     * @param data the payload byte array
+     * @param dataLength the length of the payload byte array
+     */
     public RtpPacket(int payloadType, int sequenceNumber, int timeStamp, int ssrc, int marker, byte[] data, int dataLength) {
 
         //fill changing header fields:
@@ -64,9 +71,11 @@ public class RtpPacket {
         payload = Arrays.copyOf(data, payloadSize);
     }
 
-    //--------------------------
-    //Constructor of an RTPpacket object from the packet bistream
-    //--------------------------
+    /**
+     * Re-constructs an RtpPacket object from the packet bytes
+     * @param packet The original RtpPacket in bytes
+     * @param packetSize The size of the packet bytes array
+     */
     public RtpPacket(byte[] packet, int packetSize) {
 
         //check if total packet size is lower than the header size
@@ -89,20 +98,36 @@ public class RtpPacket {
         }
     }
 
+    /**
+     * Extracts the payload from the packet
+     * @param data The byte array into which the payload if copied
+     */
     public void getPayload(byte[] data) {
 
         if (payloadSize >= 0) System.arraycopy(payload, 0, data, 0, payloadSize);
 
     }
 
+    /**
+     * Gets the size of the payload bytes
+     * @return the payload bytes array length
+     */
     public int getPayloadLength() {
         return (payloadSize);
     }
 
+    /**
+     * Gets the size of the packet bytes
+     * @return the packet bytes array length
+     */
     public int getLength() {
         return (payloadSize + RTP_HEADER_SIZE);
     }
 
+    /**
+     * Extracts the RtpPacket object into a byte array to be sent in an RTP session
+     * @param packet The byte array into which the information is copied
+     */
     public void getPacket(byte[] packet) {
         //construct the packet = header + payload
         if (RTP_HEADER_SIZE >= 0) System.arraycopy(header, 0, packet, 0, RTP_HEADER_SIZE);

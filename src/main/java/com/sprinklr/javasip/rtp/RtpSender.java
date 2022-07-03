@@ -14,7 +14,7 @@ import java.util.Queue;
 
 import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
 
-/*
+/**
 Agent's RTP sender which sends data packets to Ozonetel in the RTP session
  */
 public class RtpSender implements Runnable {
@@ -27,13 +27,24 @@ public class RtpSender implements Runnable {
 
     private volatile boolean exit = false;
 
-
+    /**
+     * Instantiates an RtpSender object responsible for sending the processed audio data to the remote destination
+     *
+     * @param rtpRemoteAddress The remote RTP address where the packets are to be sent
+     * @param outboundRtpQueue The queue from which data is polled and sent to the remote destination
+     * @param agentConfig The configuration of the Agent to whom this RtpSender entity belongs
+     */
     public RtpSender(RtpAddress rtpRemoteAddress, Queue<byte[]> outboundRtpQueue, AgentConfig agentConfig) {
         this.rtpRemoteAddress = rtpRemoteAddress;
         this.outboundRtpQueue = outboundRtpQueue;
         this.agentConfig = agentConfig;
     }
 
+    /**
+     * Starts transmission of the data packets to be sent to the remote destination in the RTP session
+     * @throws InterruptedException
+     * @throws IOException
+     */
     public void start() throws InterruptedException, IOException {
 
         InetAddress remoteRtpIp = InetAddress.getByName(rtpRemoteAddress.getAddress());
@@ -55,12 +66,23 @@ public class RtpSender implements Runnable {
         LOGGER.info("Stopping rtp transmission from {}", agentConfig.getAgentName());
     }
 
+    /**
+     * Helper function which sends the data
+     * @param remoteRtpIp the IP address of the remote RTP address
+     * @param remoteRtpPort the port of the remote RTP address
+     * @param datagramSocket the DatagramSocket used to send the data
+     * @param data the data in bytes to be sent
+     * @throws IOException
+     */
     private void sendBytes(InetAddress remoteRtpIp, int remoteRtpPort, DatagramSocket datagramSocket, byte[] data) throws IOException {
         DatagramPacket sendPacket;
         sendPacket = new DatagramPacket(data, data.length, remoteRtpIp, remoteRtpPort);
         datagramSocket.send(sendPacket);
     }
 
+    /**
+     * Overridden method of Runnable which starts this on a new thread
+     */
     @Override
     public void run() {
         try {
@@ -76,6 +98,9 @@ public class RtpSender implements Runnable {
         }
     }
 
+    /**
+     * Stops the transmission of RTP packets
+     */
     public void stop() {
         exit = true;
     }
