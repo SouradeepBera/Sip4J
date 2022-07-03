@@ -368,48 +368,30 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     }
 
     private void shutDown() {
-        try {
-            LOGGER.info("nulling server references for {}", agentConfig.agentName);
-            sipStack.stop();
-            inviteServerTransaction = null;
-            inviteRequest = null;
-            //cancel registration task running at regular intervals
-            LOGGER.info("Cancelling registration task for {}: {}", agentConfig.agentName, sendRegisterRequestTask.cancel());
-            timer.cancel();
-            LOGGER.info("Cancelling timer for {}", agentConfig.agentName);
-
-            LOGGER.info("Server shutdown in {}", agentConfig.agentName);
-
-        } catch (Exception ex) {
-            LOGGER.error("Error in shutting down server for {}: {}", agentConfig.agentName, ex.toString());
-        }
+        LOGGER.info("nulling server references for {}", agentConfig.agentName);
+        sipStack.stop();
+        inviteServerTransaction = null;
+        inviteRequest = null;
+        //cancel registration task running at regular intervals
+        LOGGER.info("Cancelling registration task for {}: {}", agentConfig.agentName, sendRegisterRequestTask.cancel());
+        timer.cancel();
+        LOGGER.info("Cancelling timer for {}", agentConfig.agentName);
+        LOGGER.info("Server shutdown in {}", agentConfig.agentName);
     }
 
-    public SessionDescription extractSDP(RequestEvent requestEvent) {
+    public SessionDescription extractSDP(RequestEvent requestEvent) throws SdpParseException {
         Request request = requestEvent.getRequest();
         byte[] sdpContent = (byte[]) request.getContent();
-        SessionDescription sessionDescription = null;
-        try {
-            sessionDescription = sdpFactory.createSessionDescription(new String(sdpContent));
-        } catch (SdpParseException e) {
-            LOGGER.error("Error while extracting SDP in {}", agentConfig.agentName);
-        }
-        return sessionDescription;
+        return sdpFactory.createSessionDescription(new String(sdpContent));
     }
 
     public Connection extractConnection(SessionDescription sdp) {
         return sdp.getConnection();
     }
 
-    public Media extractMedia(SessionDescription sdp) {
-        Media media = null;
-        try {
-            Vector<MediaDescription> mediaDescriptions = sdp.getMediaDescriptions(false);
-            MediaDescription mediaDescription = mediaDescriptions.get(0);
-            media = mediaDescription.getMedia();
-        } catch (SdpException e) {
-            LOGGER.error("Error while extracting media from sdp content in {}", agentConfig.agentName);
-        }
-        return media;
+    public Media extractMedia(SessionDescription sdp) throws SdpException {
+        Vector<MediaDescription> mediaDescriptions = sdp.getMediaDescriptions(false);
+        MediaDescription mediaDescription = mediaDescriptions.get(0);
+        return mediaDescription.getMedia();
     }
 }
