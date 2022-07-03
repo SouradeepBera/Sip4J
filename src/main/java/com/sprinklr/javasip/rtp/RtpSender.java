@@ -5,11 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Queue;
 
 import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
@@ -34,49 +34,31 @@ public class RtpSender implements Runnable {
         this.agentConfig = agentConfig;
     }
 
-    public void start() throws InterruptedException {
+    public void start() throws InterruptedException, IOException {
 
-        InetAddress remoteRtpIp = null;
+        InetAddress remoteRtpIp = InetAddress.getByName(rtpRemoteAddress.getAddress());
         int remoteRtpPort = rtpRemoteAddress.getPort();
-        try {
-            remoteRtpIp = InetAddress.getByName(rtpRemoteAddress.getAddress());
-        } catch (UnknownHostException e) {
-            LOGGER.error("UnknownHostException in {}: {}", agentConfig.agentName, e.toString());
-        }
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
 
             LOGGER.info("Starting rtp transmission from {}", agentConfig.agentName);
 
             while (!exit) {
-
                 byte[] data = outboundRtpQueue.poll(); //packet size should be correctly configured and sent from bot websocket server side
                 if (data == null) {
                     Thread.sleep(SLEEP_CPU_TIME_MS); //sleep or use blocking queue, refer https://www.baeldung.com/java-concurrent-queues
                     continue;
                 }
-
                 sendBytes(remoteRtpIp, remoteRtpPort, datagramSocket, data);
             }
-
-        } catch (SocketException e) {
-            LOGGER.error("SocketException in {}: {}", agentConfig.agentName, e.toString());
         }
-
         LOGGER.info("Stopping rtp transmission from {}", agentConfig.agentName);
-
     }
 
-    private void sendBytes(InetAddress remoteRtpIp, int remoteRtpPort, DatagramSocket datagramSocket, byte[] data) {
+    private void sendBytes(InetAddress remoteRtpIp, int remoteRtpPort, DatagramSocket datagramSocket, byte[] data) throws IOException {
         DatagramPacket sendPacket;
-        try {
-            sendPacket = new DatagramPacket(data, data.length, remoteRtpIp, remoteRtpPort);
-            datagramSocket.send(sendPacket);
-        } catch (UnknownHostException e) {
-            LOGGER.error("UnknownHostException in {}: {}", agentConfig.agentName, e.toString());
-        } catch (IOException e) {
-            LOGGER.error("IOException in {}: {} ", agentConfig.agentName, e.toString());
-        }
+        sendPacket = new DatagramPacket(data, data.length, remoteRtpIp, remoteRtpPort);
+        datagramSocket.send(sendPacket);
     }
 
     @Override
@@ -84,9 +66,13 @@ public class RtpSender implements Runnable {
         try {
             start();
         } catch (InterruptedException e) {
-            LOGGER.error("Interrupted while waiting for data to send from outbound queue: {}", e.toString());
-            stop();
+            LOGGER.error("{} interrupted in RtpSender", agentConfig.agentName);
             Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            LOGGER.error("In RtpSender, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.agentName, e.getCause(), sw);
         }
     }
 

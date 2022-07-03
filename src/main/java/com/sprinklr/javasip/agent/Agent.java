@@ -15,6 +15,8 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.ObjectInUseException;
 import javax.sip.PeerUnavailableException;
 import javax.sip.TransportNotSupportedException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.Queue;
@@ -24,7 +26,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
-
 
 import static com.sprinklr.javasip.utils.Constants.WS_RECONNECT_CODE;
 
@@ -42,54 +43,32 @@ public class Agent implements Runnable {
         this.agentState = new AgentState(agentConfig.agentName);
     }
 
-    public void start() {
+    public void start() throws PeerUnavailableException, TransportNotSupportedException, TooManyListenersException, InvalidArgumentException, ObjectInUseException, ParseException, ExecutionException, InterruptedException, URISyntaxException {
 
         SipAllFactories sipAllFactories;
-        try {
-            sipAllFactories = SipAllFactories.getInstance();
-        } catch (PeerUnavailableException e) {
-            LOGGER.error("Peer Unavailable, unable to start {}", agentConfig.agentName);
-            return;
-        }
-
+        sipAllFactories = SipAllFactories.getInstance();
 
         Queue<byte[]> inboundRtpQueue = new ConcurrentLinkedQueue<>();
         Queue<byte[]> outboundRtpQueue = new ConcurrentLinkedQueue<>();
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
         executor.setCorePoolSize(3);
-        executor.setMaximumPoolSize(20);
+        executor.setMaximumPoolSize(6);
 
         SipExtension sip;
-        try {
-            sip = new SipExtension(sipAllFactories, agentState, agentConfig);
-        } catch (PeerUnavailableException | TransportNotSupportedException | InvalidArgumentException |
-                 ObjectInUseException | TooManyListenersException | ParseException e) {
-            LOGGER.error("Sip object not created for {}: {}", agentConfig.agentName, e.toString());
-            return;
-        }
+        sip = new SipExtension(sipAllFactories, agentState, agentConfig);
+
         /*
          * Refer to jain-sip-ri/gov.nist/javax/sip/SipStackImpl and src/main/java/com.spr/sip/Sip to understand threading
-         * Currently, javax.sip.REENTRANT_LISTENER = false and javax.sip.THREAD_POOL_SIZE=infinity (defaults).Change properties if behaviour is to be changed
+         * Currently, javax.sip.REENTRANT_LISTENER = false and defaults are used.Change properties if behaviour is to be changed
          */
         Future<RtpAddress> rtpRemoteAddressFuture = executor.submit(sip);
 
         RtpAddress rtpRemoteAddress;
-        try {
-            rtpRemoteAddress = rtpRemoteAddressFuture.get();
-        } catch (InterruptedException e) {
-            LOGGER.error("Interrupted future in {}: {}", agentConfig.agentName, e.toString());
-            Thread.currentThread().interrupt();
-            return;
-        } catch (ExecutionException e) {
-            LOGGER.error("Something went wrong in execution: {}", e.toString());
-            return;
-        }
-
+        rtpRemoteAddress = rtpRemoteAddressFuture.get();
 
         if (!(rtpRemoteAddress.getAddressType().equals(agentConfig.rtpAddressType)) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.rtpNetworkType))) {
-            LOGGER.error("Rtp address type or network type not matching. Check {}", agentConfig.agentName);
-            return;
+            throw new IllegalStateException("Rtp address type or network type not matching");
         }
 
         //start listening on rtp port for rtp data from ozonetel (send data only after this is running)
@@ -98,13 +77,7 @@ public class Agent implements Runnable {
 
         //connect websocket to botserver (make sure botserver is running)
         Websocket websocket;
-        try {
-            websocket = new Websocket(outboundRtpQueue, agentState, agentConfig);
-        } catch (URISyntaxException e) {
-            LOGGER.error("Websocket object not created in {}: {}", agentConfig.agentName, e.toString());
-            rtpReceiver.stop();
-            return;
-        }
+        websocket = new Websocket(outboundRtpQueue, agentState, agentConfig);
         websocket.connect(); //starts a read and write thread internally, 2 new threads started
 
         //send the returned data to ozontel rtp
@@ -122,6 +95,9 @@ public class Agent implements Runnable {
                     websocket.reconnect(); //reconnecting immediately, thread.sleep to delay
                     LOGGER.info("Reconnecting {} to bot websocket server", agentConfig.agentName);
                 }
+                else {
+                    throw new WebsocketNotConnectedException();
+                }
             }
         }
 
@@ -129,7 +105,6 @@ public class Agent implements Runnable {
         rtpSender.stop();
         websocket.close();
         executor.shutdown();
-
     }
 
     public AgentConfig getConfig() {
@@ -147,6 +122,16 @@ public class Agent implements Runnable {
 
     @Override
     public void run() {
-        start();
+        try {
+            start();
+        } catch (InterruptedException e) {
+            LOGGER.error("{} interrupted in Agent", agentConfig.agentName);
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            LOGGER.error("In Agent, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.agentName, e.getCause(), sw);
+        }
     }
 }

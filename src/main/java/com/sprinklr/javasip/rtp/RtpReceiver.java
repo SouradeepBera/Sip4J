@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.*;
 import java.util.Queue;
 
@@ -25,14 +27,9 @@ public class RtpReceiver implements Runnable {
         this.agentConfig = agentConfig;
     }
 
-    public void start() {
+    public void start() throws IOException {
 
-        InetAddress localRtpIp = null;
-        try {
-            localRtpIp = InetAddress.getByName(agentConfig.rtpLocalIp);
-        } catch (UnknownHostException e) {
-            LOGGER.error("UnknownHostException in {}: {}", agentConfig.agentName, e.toString());
-        }
+        InetAddress localRtpIp = InetAddress.getByName(agentConfig.rtpLocalIp);
 
         try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.rtpLocalPort, localRtpIp)) {
 
@@ -41,14 +38,11 @@ public class RtpReceiver implements Runnable {
             while (!exit) {
                 readBytes(serverSocket);
             }
-
-        } catch (SocketException e) {
-            LOGGER.error("SocketException in {}: {}", agentConfig.agentName, e.toString());
         }
         LOGGER.info("{} stopped listening on udp:{}:{}", agentConfig.agentName, agentConfig.rtpLocalIp, agentConfig.rtpLocalPort);
     }
 
-    private void readBytes(DatagramSocket serverSocket) {
+    private void readBytes(DatagramSocket serverSocket) throws IOException {
         byte[] receiveData;
         DatagramPacket receivePacket;
         try {
@@ -59,14 +53,19 @@ public class RtpReceiver implements Runnable {
             inboundRtpQueue.offer(receivePacket.getData());
         } catch (SocketTimeoutException e) {
             //no message received, timeout, check for exit condition in while loop
-        } catch (IOException e) {
-            LOGGER.error("IOException in {}: {} ", agentConfig.agentName, e.toString());
         }
     }
 
     @Override
     public void run() {
-        start();
+        try {
+            start();
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            LOGGER.error("In RtpReceiver, {} alert! IOException: {}", agentConfig.agentName, sw);
+        }
     }
 
     public void stop() {
