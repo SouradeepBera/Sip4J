@@ -3,7 +3,6 @@ package com.sprinklr.javasip.service;
 import com.sprinklr.javasip.agent.Agent;
 import com.sprinklr.javasip.agent.AgentConfig;
 import com.sprinklr.javasip.agent.AgentManager;
-import com.sprinklr.javasip.agent.AgentState;
 import com.sprinklr.javasip.sip.SipState;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +45,11 @@ public class AgentService {
                 .build();
 
         if(agentManager.containsAgent(agentConfig.agentName)){
-            agentManager.getAgentByName(agentConfig.agentName).clear();
+            Agent prevAgentInst = agentManager.getAgentByName(agentConfig.agentName);
+            if(!SipState.DISCONNECTED.equals(prevAgentInst.getState().getSipState())) {
+                throw new IllegalStateException("Previous instance of agent still not disconnected from call");
+            }
+            prevAgentInst.clear();
             agentManager.removeAgentByName(agentConfig.agentName);
         }
 
