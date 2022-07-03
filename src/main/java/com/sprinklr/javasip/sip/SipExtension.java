@@ -84,7 +84,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     private RtpAddress rtpRemoteAddress;
     private volatile boolean isCallableReady = false;
 
-    public SipExtension(SipAllFactories sipAllFactories, AgentState agentState, AgentConfig agentConfig) throws PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException, ObjectInUseException, TooManyListenersException, ParseException, TooManyListenersException, ObjectInUseException, PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException {
+    public SipExtension(SipAllFactories sipAllFactories, AgentState agentState, AgentConfig agentConfig) throws ParseException, TooManyListenersException, ObjectInUseException, PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException {
 
         this.agentState = agentState;
         this.agentConfig = agentConfig;
