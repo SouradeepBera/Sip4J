@@ -45,6 +45,11 @@ public class AgentService {
                 .wsConfig(config.get("wsServerUri"))
                 .build();
 
+        if(agentManager.containsAgent(agentConfig.agentName)){
+            agentManager.getAgentByName(agentConfig.agentName).clear();
+            agentManager.removeAgentByName(agentConfig.agentName);
+        }
+
         Agent agent = new Agent(agentConfig);
         agentManager.addAgent(agent, agentConfig);
         executor.submit(agent);
@@ -57,25 +62,6 @@ public class AgentService {
             statuses.add(status);
         }
         return statuses;
-    }
-
-    public List<String> reconnectDisconnected() {
-        List<String> infoMsgList = new ArrayList<>();
-        for (String agentName : agentManager.getNames()) {
-            Agent agent = agentManager.getAgentByName(agentName);
-            AgentState agentState = agent.getState();
-            AgentConfig agentConfig = agent.getConfig();
-            if (SipState.DISCONNECTED.equals(agentState.getSipState())) {
-                agent.shutdown();
-                agentManager.removeAgentByName(agentName);
-
-                Agent newAgent = new Agent(agentConfig);
-                agentManager.addAgent(newAgent, agentConfig);
-                executor.submit(newAgent);
-                infoMsgList.add("Reconnected " + agentName);
-            }
-        }
-        return infoMsgList;
     }
 
     public void shutdown() {

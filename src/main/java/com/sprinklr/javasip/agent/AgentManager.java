@@ -30,6 +30,10 @@ public class AgentManager {
         agentMapper.remove(agentName);
     }
 
+    public boolean containsAgent(String agentName){
+        return agentMapper.containsKey(agentName);
+    }
+
     public Set<String> getNames() {
         return agentMapper.keySet();
     }

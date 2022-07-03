@@ -35,9 +35,4 @@ public class AgentController {
     public List<String> showAllStatus() {
         return agentService.showAllStatus();
     }
-
-    @GetMapping(value = "/reconnectDisconnected")
-    public List<String> reconnectDisconnected() {
-        return agentService.reconnectDisconnected();
-    }
 }

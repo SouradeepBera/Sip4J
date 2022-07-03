@@ -115,7 +115,7 @@ public class Agent implements Runnable {
         return agentState;
     }
 
-    public void shutdown() {
+    public void clear() {
         agentConfig = null;
         agentState = null;
     }
