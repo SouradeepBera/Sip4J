@@ -18,6 +18,9 @@ The media packets received by the Agent are then forwarded to the VoiceBot. Once
 on the VoiceBot's end, it sends the processed packets via websocket to the Agent which again communicates it
 back to Ozonetel using the RTP session.
 
+![Alt text](diagrams/Agent%20Breakdown.jpg)
+![Alt text](diagrams/Component%20Breakdown.jpg)
+
 ---
 
 ## Using javasip
@@ -72,3 +75,7 @@ public class StartAgentNonBlocking() {
 ---
 
 ### Configuring an AgentManager
+When dealing with multiple agents, it might be helpful to keep track of the Agents along with their states
+and configurations.
+Agent encapsulates its corresponding state and configuration. Storing the Agent itself mapped by
+it's name is sufficient to provide the required information.
