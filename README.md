@@ -18,8 +18,8 @@ The media packets received by the Agent are then forwarded to the VoiceBot. Once
 on the VoiceBot's end, it sends the processed packets via websocket to the Agent which again communicates it
 back to Ozonetel using the RTP session.
 
-![Alt text](diagrams/Agent%20Breakdown.png)
-![Alt text](diagrams/Component%20Breakdown.png)
+![Alt text](diagrams/Agent%20Breakdown.jpg)
+![Alt text](diagrams/Component%20Breakdown.jpg)
 
 ---
 
