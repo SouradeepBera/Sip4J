@@ -22,10 +22,10 @@ Service class for Agent
 @Service
 public class AgentService {
 
+    private static final String YAML_CONFIG_DIR = "src/main/resources/yaml/";
     private final ThreadPoolExecutor executor;
     private final AgentManager agentManager;
     private final Yaml yaml;
-    private final static String YAML_CONFIG_DIR = "src/main/resources/yaml/";
 
     public AgentService() {
         executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
