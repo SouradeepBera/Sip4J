@@ -6,7 +6,7 @@
 
 **javasip** was developed for replacing JsSip in Java, using SIP+SDP for signalling and RTP+Websocket
 for media transfer.\
-ALthough **javasip** was specifically designed for the Sprinklr usecase, it can very easily be
+Although **javasip** was specifically designed for the Sprinklr usecase, it can very easily be
 modified and extended to create a high-level sip library for Java.
 
 ---
