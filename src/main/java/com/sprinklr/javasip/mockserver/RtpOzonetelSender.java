@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 
@@ -19,7 +18,6 @@ import java.nio.file.Files;
 public class RtpOzonetelSender {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpOzonetelSender.class);
-    private static final String IO_EXCEPTION_MSG = "IOException {}";
 
     /*
     Hardcoded values, will depend on Ozonetel, set here just to mimic actual flow
@@ -34,27 +32,13 @@ public class RtpOzonetelSender {
     Hardcoded values end
      */
 
-    public void run() {
+    public void run() throws IOException {
         File file = new File(READ_AUDIO_FILE);
 
-        byte[] fileBytes;
-        try {
-            fileBytes = Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            LOGGER.error(IO_EXCEPTION_MSG, e.toString());
-            return;
-        }
-
+        byte[] fileBytes = Files.readAllBytes(file.toPath());
         LOGGER.info("Data length {} ", fileBytes.length);
 
-        InetAddress address;
-        try {
-            address = InetAddress.getByName(RTP_LOCAL_IP);
-        } catch (UnknownHostException e) {
-            LOGGER.error("UnknownHostException {}", e.toString());
-            return;
-        }
-
+        InetAddress address = InetAddress.getByName(RTP_LOCAL_IP);
         ByteBuffer audioBuffer = ByteBuffer.wrap(fileBytes);
 
         int cnt = 0;
@@ -83,12 +67,10 @@ public class RtpOzonetelSender {
                 startTime += 1;
             }
             LOGGER.info("Sent {} packets from Ozonetel from {}", cnt, READ_AUDIO_FILE);
-        } catch (IOException e) {
-            LOGGER.error(IO_EXCEPTION_MSG, e.toString());
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         new RtpOzonetelSender().run();
     }
 }

@@ -51,8 +51,6 @@ public class RtpOzonetelReceiver {
             while (!exit) {
                 getBytes(serverSocket);
             }
-        } catch (IOException e) {
-            LOGGER.error(e.toString());
         }
 
         LOGGER.info("Total size={}", storeRecv.size());
