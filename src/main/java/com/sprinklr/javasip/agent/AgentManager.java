@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/*
+/**
  * Manager class. Stores agents mapped by agent names
  */
 public class AgentManager {

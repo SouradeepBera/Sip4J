@@ -29,7 +29,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.sprinklr.javasip.utils.Constants.WS_RECONNECT_CODE;
 
-/*
+/**
  * Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
  */
 public class Agent implements Runnable {
@@ -43,6 +43,18 @@ public class Agent implements Runnable {
         this.agentState = new AgentState(agentConfig.getAgentName());
     }
 
+    /**
+     * Starts the Agent
+     * @throws PeerUnavailableException
+     * @throws TransportNotSupportedException
+     * @throws TooManyListenersException
+     * @throws InvalidArgumentException
+     * @throws ObjectInUseException
+     * @throws ParseException
+     * @throws ExecutionException
+     * @throws InterruptedException
+     * @throws URISyntaxException
+     */
     public void start() throws PeerUnavailableException, TransportNotSupportedException, TooManyListenersException, InvalidArgumentException, ObjectInUseException, ParseException, ExecutionException, InterruptedException, URISyntaxException {
 
         SipAllFactories sipAllFactories;
@@ -107,19 +119,33 @@ public class Agent implements Runnable {
         executor.shutdown();
     }
 
+    /**
+     * Returns the configuration of the Agent
+     * @return configuration of the Agent
+     */
     public AgentConfig getConfig() {
         return agentConfig;
     }
 
+    /**
+     * Returns the state of the Agent
+     * @return state of the Agent
+     */
     public AgentState getState() {
         return agentState;
     }
 
+    /**
+     * Clears the Agent's configuration and state. Should be called after start() has finished executing
+     */
     public void clear() {
         agentConfig = null;
         agentState = null;
     }
 
+    /**
+     * Overridden method of Runnable. Starts the Agent in a new thread.
+     */
     @Override
     public void run() {
         try {
