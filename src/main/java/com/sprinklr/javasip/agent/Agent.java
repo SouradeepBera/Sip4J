@@ -27,14 +27,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static com.sprinklr.javasip.utils.Constants.WS_RECONNECT_CODE;
-
 /**
  * Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
  */
 public class Agent implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);
+    private static final int WS_RECONNECT_CODE = 1006;
     private static final int N_ENTITIES = 3;
     private AgentConfig agentConfig;
     private AgentState agentState;

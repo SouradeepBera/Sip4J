@@ -9,8 +9,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.*;
 import java.util.Queue;
-
-import static com.sprinklr.javasip.utils.Constants.RTP_BLOCK_SOCKET_TIME_MS;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Agent's RTP receiver which receives data packets from Ozonetel in RTP session
@@ -18,6 +17,7 @@ import static com.sprinklr.javasip.utils.Constants.RTP_BLOCK_SOCKET_TIME_MS;
 public class RtpReceiver implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiver.class);
+    private static final int RTP_BLOCK_SOCKET_TIME_MS = (int) TimeUnit.MILLISECONDS.toMillis(1000);
     private final Queue<byte[]> inboundRtpQueue;
     private final AgentConfig agentConfig;
     private volatile boolean exit = false;

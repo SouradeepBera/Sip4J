@@ -27,8 +27,10 @@ import javax.sip.message.Response;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
-import static com.sprinklr.javasip.utils.Constants.SIP_ALLOWED_METHODS;
 
 /**
  * Helper class which creates requests
@@ -36,6 +38,7 @@ import static com.sprinklr.javasip.utils.Constants.SIP_ALLOWED_METHODS;
 public class SipRequestCreator {
 
     private static final String AUTHENTICATION_SCHEME = "Digest";
+    private static final List<String> SIP_ALLOWED_METHODS = Collections.unmodifiableList(Arrays.asList(Request.INVITE, Request.BYE, Request.CANCEL, Request.ACK));
     private final SipProvider sipProvider;
     private final AddressFactory addressFactory;
     private final MessageFactory messageFactory;
