@@ -1,9 +1,0 @@
-com.sprinklr.javasip
-com.sprinklr.javasip.agent
-com.sprinklr.javasip.controller
-com.sprinklr.javasip.mockserver
-com.sprinklr.javasip.rtp
-com.sprinklr.javasip.service
-com.sprinklr.javasip.sip
-com.sprinklr.javasip.utils
-com.sprinklr.javasip.websocket

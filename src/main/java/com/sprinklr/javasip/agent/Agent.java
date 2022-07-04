@@ -35,6 +35,7 @@ import static com.sprinklr.javasip.utils.Constants.WS_RECONNECT_CODE;
 public class Agent implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);
+    private static final int N_ENTITIES = 3;
     private AgentConfig agentConfig;
     private AgentState agentState;
 
@@ -64,8 +65,8 @@ public class Agent implements Runnable {
         Queue<byte[]> outboundRtpQueue = new ConcurrentLinkedQueue<>();
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        executor.setCorePoolSize(3);
-        executor.setMaximumPoolSize(6);
+        executor.setCorePoolSize(N_ENTITIES);
+        executor.setMaximumPoolSize(N_ENTITIES);
 
         SipExtension sip;
         sip = new SipExtension(sipAllFactories, agentState, agentConfig);

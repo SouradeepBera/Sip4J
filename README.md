@@ -23,12 +23,6 @@ back to Ozonetel using the RTP session.
 
 ---
 
-## Documentation
-
-Refer to the JavaDocs [here](./docs).
-
----
-
 ## Using javasip
 
 ---

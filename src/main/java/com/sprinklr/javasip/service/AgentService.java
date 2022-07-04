@@ -23,6 +23,7 @@ Service class for Agent
 public class AgentService {
 
     private static final String YAML_CONFIG_DIR = "src/main/resources/yaml/";
+    private static final int N_AGENTS = 3;
     private final ThreadPoolExecutor executor;
     private final AgentManager agentManager;
     private final Yaml yaml;
@@ -32,7 +33,8 @@ public class AgentService {
      */
     public AgentService() {
         executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        executor.setCorePoolSize(2); //set as per requirement, also add setMaximumPoolSize
+        executor.setCorePoolSize(N_AGENTS);
+        executor.setMaximumPoolSize(N_AGENTS);
         agentManager = new AgentManager();
         yaml = new Yaml();
     }
