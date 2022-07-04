@@ -7,7 +7,7 @@ import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
-/*
+/**
  * Singleton which initialises sip+sdp factories
  */
 public class SipAllFactories {
@@ -28,6 +28,11 @@ public class SipAllFactories {
         messageFactory = sipFactory.createMessageFactory();
     }
 
+    /**
+     * Returns the single instance of this class. If no instance is created yet, it creates a new one
+     * @return the single instance of this class
+     * @throws PeerUnavailableException
+     */
     public static SipAllFactories getInstance() throws PeerUnavailableException {
         if (singleInstance == null) {
             singleInstance = new SipAllFactories();

@@ -59,31 +59,92 @@ import java.util.concurrent.TimeUnit;
 
 import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
 
-/*
- * Sip entity which handles singalling on Agent's behalf
+/**
+ * Sip entity which handles signalling on Agent's behalf.
+ * It implements SipListener which defines the methods required by an application to receive and process Events that are emitted by an object implementing the SipProvider interface.
  */
 public class SipExtension implements SipListener, Callable<RtpAddress> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SipExtension.class);
 
+    /**
+     * The SdpFactory enables applications to encode and decode SDP messages. The SdpFactory can be used to construct a SessionDescription object programmatically and also from Strings.
+     */
     private final SdpFactory sdpFactory;
+    /**
+     * This interface provides factory methods that allow an application to create Address objects, URI's, SipURI's and TelURL's from a particular implementation of this specification. It is a singleton
+     */
     private final AddressFactory addressFactory;
+    /**
+     * This interface provides factory methods that allow an application to create Request and Response messages from a particular implementation of JAIN SIP. It is a singleton
+     */
     private final MessageFactory messageFactory;
+    /**
+     * This interface provides factory methods that allow an application to create Header object from a particular implementation of JAIN SIP. It is a singleton
+     */
     private final HeaderFactory headerFactory;
+    /**
+     * Defines the methods that are to be used by an application implementing the SipListener interface to control the architecture and setup of the SIP stack.
+     */
     private final SipStack sipStack;
+    /**
+     * Maintains states (SIP state and Websocket state) of the agent
+     */
     private final AgentState agentState;
+    /**
+     * Used to schedule the sendRegisterRequestTask for future execution in a background thread
+     */
     private final Timer timer;
+    /**
+     * The task representing the REGISTER request which is to be sent in regular intervals
+     */
     private final TimerTask sendRegisterRequestTask;
+    /**
+     * The REGISTER request (without authorization) which is to be sent in regular intervals to maintain registration of the Agent in the Registrar server
+     */
     private final Request registerRequest;
+    /**
+     * Helper object to create requests
+     */
     private final SipRequestCreator sipRequestCreator;
+    /**
+     * This interface represents the messaging entity of a SIP stack and as such is the interface that defines the messaging and transactional component view of the SIP stack.
+     */
     private final SipProvider sipProvider;
+    /**
+     * Represents configuration of an Agent, as read from the config file
+     */
     private final AgentConfig agentConfig;
 
-    private ServerTransaction inviteServerTransaction; //storing for CANCEL request
+    /**
+     * The invite server transaction, which might be used in a CANCEL request
+     */
+    private ServerTransaction inviteServerTransaction;
+    /**
+     * The INVITE request sent to SipExtension, which might be used in a CANCEL request
+     */
     private Request inviteRequest; //storing for CANCEL request
+    /**
+     * The remote RTP address where data packets are to be sent. It is set upon parsing the INVITE SDP and returned to the Agent
+     */
     private RtpAddress rtpRemoteAddress;
+    /**
+     * Flag variable specifying whether or not the remote RTP address has been set
+     */
     private volatile boolean isCallableReady = false;
 
+    /**
+     * Initialises a SipExtension for an Agent. Assigns factories, registers it to the registrar server and schedules its future registrations
+     * @param sipAllFactories Singleton object encapsulating all the factory methods
+     * @param agentState Maintains states (SIP state and Websocket state) of the agent
+     * @param agentConfig Represents configuration of an Agent, as read from the config file
+     * @throws ParseException
+     * @throws TooManyListenersException
+     * @throws ObjectInUseException
+     * @throws PeerUnavailableException
+     * @throws TransportNotSupportedException
+     * @throws InvalidArgumentException
+     */
     public SipExtension(SipAllFactories sipAllFactories, AgentState agentState, AgentConfig agentConfig) throws ParseException, TooManyListenersException, ObjectInUseException, PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException {
 
         this.agentState = agentState;
@@ -98,6 +159,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         properties.setProperty("javax.sip.STACK_NAME", agentConfig.getAgentName());
         sipStack = sipFactory.createSipStack(properties);
 
+        /*
+        This interface represents a unique IP network listening point, which consists of port transport and IP.
+        A ListeningPoint is a Java representation of the socket that a SipProvider messaging entity uses to send and receive messages.
+         */
         ListeningPoint listeningPoint = sipStack.createListeningPoint(agentConfig.getSipLocalIp(), agentConfig.getSipLocalPort(), agentConfig.getTransportMode());
         sipProvider = sipStack.createSipProvider(listeningPoint);
         sipProvider.addSipListener(this);
@@ -114,6 +179,11 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
                 TimeUnit.SECONDS.toMillis(agentConfig.getSipRegisterExpiryTimeSec() / 2)); // run every REGISTER_EXPIRY_TIME/2 seconds
     }
 
+    /**
+     * Overridden method of Callable.
+     * @return The remote RTP address after it has been set
+     * @throws InterruptedException
+     */
     @Override
     public RtpAddress call() throws InterruptedException {
         while (!isCallableReady) {
@@ -141,8 +211,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    /*
-    Process the requests sent by Ozontel's User Agent Client to Sprinklr's SipEntity (UAS)
+    /**
+     * Process the requests sent by Ozontel's User Agent Client to Sprinklr's SipEntity (UAS)
+     * @param requestEvent Request events represent request messages that are received
      */
     @Override
     public void processRequest(RequestEvent requestEvent) {
@@ -170,8 +241,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    /*
-    Process the responses sent by Ozontel's User Agent Server to Sprinklr's SipEntity (UAC)
+    /**
+     * Process the responses sent by Ozontel's User Agent Server to Sprinklr's SipEntity (UAC)
+     * @param responseEvent Response messages emitted as events by the SipProvider.
      */
     @Override
     public void processResponse(ResponseEvent responseEvent) {
@@ -192,8 +264,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         processRegisterResponse(response);
     }
 
-    /*
-    Process the response to our REGISTER request, acting as UAC
+    /**
+     * Process the response to our REGISTER request, acting as UAC
+     * @param response The response obtained from the registrar server to our REGISTER request
      */
     public void processRegisterResponse(Response response) {
         if (response.getStatusCode() == Response.OK) {
@@ -216,8 +289,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    /*
-     Process the ACK request, acting as UAS
+    /**
+     * Process the ACK request, acting as UAS
+     * @param serverTransaction Transaction from server's side
      */
     public void processAckRequest(ServerTransaction serverTransaction) {
         LOGGER.info("{} (UAS): got an ACK! ", agentConfig.getAgentName());
@@ -228,8 +302,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    /*
-     * Process the INVITE request, acting as UAS
+    /**
+     * Process the INVITE request, acting as UAS. Transitions Agent's SipState from REGISTERED->CONNECTING->CONNECTED
+     * @param requestEvent The Request event representing the INVITE request messages that is received
+     * @param serverTransaction Transaction from server's side
      */
     public void processInviteRequest(RequestEvent requestEvent, ServerTransaction serverTransaction) {
 
@@ -284,8 +360,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    /*
-     * Process the BYE request, acting as UAS
+    /**
+     * Process the BYE request, acting as UAS. Transitions Agent's SipState to DISCONNECTED.
+     * @param requestEvent The Request event representing the BYE request messages that is received
+     * @param serverTransaction Transaction from server's side
      */
     public void processByeRequest(RequestEvent requestEvent, ServerTransaction serverTransaction) {
 
@@ -306,9 +384,11 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         }
     }
 
-    /*
-     * Process the CANCEL request, acting as UAS. A CANCEL request SHOULD NOT be sent to cancel a request other than
-     * INVITE. Refer RFC 3261.
+    /**
+     * Process the CANCEL request, acting as UAS. A CANCEL request SHOULD NOT be sent to cancel a request other than INVITE. Refer RFC 3261. Transitions Agent's SipState to DISCONNECTED.
+     *
+     * @param requestEvent The Request event representing the CANCEL request messages that is received
+     * @param serverTransaction Transaction from server's side
      */
     public void processCancelRequest(RequestEvent requestEvent, ServerTransaction serverTransaction) {
 
@@ -367,6 +447,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         LOGGER.info("Local Party = {}", d.getLocalParty());
     }
 
+    /**
+     * Shuts down SipExtension of the Agent. Triggered when a BYE request is received.
+     */
     private void shutDown() {
         LOGGER.info("nulling server references for {}", agentConfig.getAgentName());
         sipStack.stop();
@@ -379,16 +462,33 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         LOGGER.info("Server shutdown in {}", agentConfig.getAgentName());
     }
 
+    /**
+     * Helper function to extract the SDP content from a request
+     * @param requestEvent he Request event representing the request messages that is received
+     * @return SessionDescription object representing the SDP content
+     * @throws SdpParseException
+     */
     public SessionDescription extractSDP(RequestEvent requestEvent) throws SdpParseException {
         Request request = requestEvent.getRequest();
         byte[] sdpContent = (byte[]) request.getContent();
         return sdpFactory.createSessionDescription(new String(sdpContent));
     }
 
+    /**
+     * Extracts the connection information from a SDP
+     * @param sdp The SessionDescription representing the SDP content
+     * @return Connection object representing the connection information
+     */
     public Connection extractConnection(SessionDescription sdp) {
         return sdp.getConnection();
     }
 
+    /**
+     * Extracts the connection information from a SDP
+     * @param sdp The SessionDescription representing the SDP content
+     * @return Media object representing the connection information
+     * @throws SdpException
+     */
     public Media extractMedia(SessionDescription sdp) throws SdpException {
         Vector<MediaDescription> mediaDescriptions = sdp.getMediaDescriptions(false);
         MediaDescription mediaDescription = mediaDescriptions.get(0);

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 
 import static com.sprinklr.javasip.utils.Constants.SIP_ALLOWED_METHODS;
 
-/*
+/**
  * Helper class which creates requests
  */
 public class SipRequestCreator {
@@ -52,6 +52,12 @@ public class SipRequestCreator {
         this.agentConfig = agentConfig;
     }
 
+    /**
+     * Create a REGISTER request without authentication to be sent to the Registrar server
+     * @return The REGISTER request
+     * @throws ParseException
+     * @throws InvalidArgumentException
+     */
     public Request createRegisterRequest() throws ParseException, InvalidArgumentException {
         //create from header
         SipURI fromAddress = addressFactory.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
@@ -105,6 +111,14 @@ public class SipRequestCreator {
         return request;
     }
 
+    /**
+     * Create a REGISTER request with authentication to be sent to the Registrar server
+     * @param response The 401 initial response which contains the nonce key
+     * @return The REGISTER request with the Authorization header
+     * @throws ParseException
+     * @throws InvalidArgumentException
+     * @throws NoSuchAlgorithmException
+     */
     public Request createRegisterRequestWithCredentials(Response response) throws ParseException, InvalidArgumentException, NoSuchAlgorithmException {
 
         WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response.getHeader(WWWAuthenticateHeader.NAME); //names of headers in last line of respective header file in jain-sip-ri
