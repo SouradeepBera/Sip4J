@@ -24,7 +24,8 @@ back to Ozonetel using the RTP session.
 ---
 
 ## Documentation
-Refer to the JavaDocs [here](./docs/index.html).
+
+Refer to the JavaDocs [here](./docs).
 
 ---
 
