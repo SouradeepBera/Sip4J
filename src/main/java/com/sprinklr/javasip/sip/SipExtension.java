@@ -233,7 +233,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
             case Request.BYE:
                 processByeRequest(requestEvent, serverTransaction);
                 break;
-            case Request.CANCEL: //CANCEL the pending INVITE request, not used for other requests as of now
+            case Request.CANCEL: //CANCEL the pending INVITE request, not used for other requests
                 processCancelRequest(requestEvent, serverTransaction);
                 break;
             default:
@@ -333,6 +333,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
             Address contactAddress = addressFactory.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
             ContactHeader contactHeader = headerFactory.createContactHeader(contactAddress);
             okResponse.addHeader(contactHeader);
+            //set other data to be conveyed to Ozonetel using okResponse.setContent(). Also add ContentTypeHeader and other headers as required
             this.inviteServerTransaction = serverTransaction;
             LOGGER.info("Invite transaction id: {}", this.inviteServerTransaction);
 
