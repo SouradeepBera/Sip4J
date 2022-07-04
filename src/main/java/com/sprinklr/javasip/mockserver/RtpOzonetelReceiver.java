@@ -30,7 +30,7 @@ public class RtpOzonetelReceiver {
     private static final int RTP_PACKET_SIZE = RTP_HEADER_SIZE + RTP_PAYLOAD_SIZE;  //not set by us
     private static final int RTP_REMOTE_PORT = 6024;   //not set by us, read from invite sdp sent by Ozonetel in Sip entity
     private static final String RTP_REMOTE_IP = "192.168.1.8"; //not set by us, read from invite sdp, read from invite sdp sent by Ozonetel in Sip entity
-    private static final String WRITE_AUDIO_FILE = "/Users/souradeep.bera/Downloads/test_audio/speech-5_out.wav"; //not set by us
+    private static final String WRITE_AUDIO_FILE = "/Users/souradeep.bera/Downloads/test_audio/javasip_audio_out.wav"; //not set by us
     /*
     Hardcoded values end
      */
