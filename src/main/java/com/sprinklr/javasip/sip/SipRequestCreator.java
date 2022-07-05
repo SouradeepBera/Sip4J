@@ -155,9 +155,6 @@ public class SipRequestCreator {
         CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(cseqNmb, Request.REGISTER);
         newRequest.setHeader(cSeqHeader);
 
-        cseqNmb++;
         return newRequest;
-
     }
-
 }
