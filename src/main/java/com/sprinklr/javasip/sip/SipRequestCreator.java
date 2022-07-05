@@ -45,7 +45,7 @@ public class SipRequestCreator {
     private final HeaderFactory headerFactory;
     private final ListeningPoint listeningPoint;
     private final AgentConfig agentConfig;
-    private long cseqNmb = 1;
+    private long cseqNmb = 1; //separately keep track of cseq number since REGISTER not part of dialog
 
     public SipRequestCreator(SipProvider sipProvider, AddressFactory addressFactory, MessageFactory messageFactory, HeaderFactory headerFactory, AgentConfig agentConfig) {
         this.sipProvider = sipProvider;
