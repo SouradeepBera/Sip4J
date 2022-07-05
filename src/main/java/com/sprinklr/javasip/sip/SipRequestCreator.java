@@ -45,6 +45,7 @@ public class SipRequestCreator {
     private final HeaderFactory headerFactory;
     private final ListeningPoint listeningPoint;
     private final AgentConfig agentConfig;
+    private long cseqNmb = 1;
 
     public SipRequestCreator(SipProvider sipProvider, AddressFactory addressFactory, MessageFactory messageFactory, HeaderFactory headerFactory, AgentConfig agentConfig) {
         this.sipProvider = sipProvider;
@@ -85,7 +86,7 @@ public class SipRequestCreator {
         CallIdHeader callIdHeader = sipProvider.getNewCallId();
 
         // Create a new Cseq header
-        CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(1L, Request.REGISTER);
+        CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(cseqNmb, Request.REGISTER);
 
         // Create a new MaxForwardsHeader
         MaxForwardsHeader maxForwards = headerFactory.createMaxForwardsHeader(70);
@@ -111,6 +112,7 @@ public class SipRequestCreator {
         ExpiresHeader expiresHeader = headerFactory.createExpiresHeader(agentConfig.getSipRegisterExpiryTimeSec());
         request.addHeader(expiresHeader);
 
+        cseqNmb++;
         return request;
     }
 
@@ -131,6 +133,7 @@ public class SipRequestCreator {
         Request newRequest = createRegisterRequest();
         CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
         newRequest.setHeader(oldCallIdHeader); //All registrations from a UAC SHOULD use the same Call-ID header field value for registrations sent to a particular registrar
+
         String userName = agentConfig.getSipLocalUsername();
         String realm = wwwAuthenticateHeader.getRealm();
         String password = agentConfig.getPassword();
@@ -147,8 +150,12 @@ public class SipRequestCreator {
         authorizationHeader.setUsername(userName);
         authorizationHeader.setURI(newRequest.getRequestURI());
         authorizationHeader.setScheme(wwwAuthenticateHeader.getScheme());
-
         newRequest.addHeader(authorizationHeader);
+
+        CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(cseqNmb, Request.REGISTER);
+        newRequest.setHeader(cSeqHeader);
+
+        cseqNmb++;
         return newRequest;
 
     }
