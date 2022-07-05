@@ -41,9 +41,9 @@ public class RtpOzonetelSender {
         InetAddress address = InetAddress.getByName(RTP_LOCAL_IP);
         ByteBuffer audioBuffer = ByteBuffer.wrap(fileBytes);
 
-        int cnt = 0;
+        int cnt = 0; //start with random number in application
         int ssrc = (int) (System.currentTimeMillis() % (int) (1e9 + 7));
-        int startTime = 0;
+        int startTime = 0; //start with random number in application
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
             DatagramPacket packet;
