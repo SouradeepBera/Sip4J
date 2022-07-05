@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
+
 /**
  * Agent class which handles signalling and media transfer. Sits between Ozonetel and Bot.
  */
@@ -99,8 +101,10 @@ public class Agent implements Runnable {
         while (!agentState.getSipState().equals(SipState.DISCONNECTED)) {
             try {
                 byte[] data = inboundRtpQueue.poll();
-                if (data == null)
+                if (data == null) {
+                    Thread.sleep(SLEEP_CPU_TIME_MS); //sleep or use blocking queue, refer https://www.baeldung.com/java-concurrent-queues
                     continue;
+                }
                 websocket.send(data);
             } catch (WebsocketNotConnectedException e) {
                 if (agentState.getWsCloseCode() == WS_RECONNECT_CODE) {
