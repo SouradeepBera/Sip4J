@@ -1,8 +1,8 @@
 package com.sprinklr.javasip.agent;
 
 import com.sprinklr.javasip.rtp.RtpAddress;
-import com.sprinklr.javasip.rtp.RtpReceiver;
-import com.sprinklr.javasip.rtp.RtpSender;
+import com.sprinklr.javasip.rtp.RtpReceiverImpl;
+import com.sprinklr.javasip.rtp.RtpSenderImpl;
 import com.sprinklr.javasip.sip.SipExtension;
 import com.sprinklr.javasip.sip.SipAllFactories;
 import com.sprinklr.javasip.sip.SipState;
@@ -86,7 +86,7 @@ public class Agent implements Runnable {
         }
 
         //start listening on rtp port for rtp data from ozonetel (send data only after this is running)
-        RtpReceiver rtpReceiver = new RtpReceiver(inboundRtpQueue, agentConfig);
+        DataReceiver rtpReceiver = new RtpReceiverImpl(inboundRtpQueue, agentConfig);
         executor.execute(rtpReceiver); //1 new thread started
 
         //connect websocket to botserver (make sure botserver is running)
@@ -95,7 +95,7 @@ public class Agent implements Runnable {
         websocket.connect(); //starts a read and write thread internally, 2 new threads started
 
         //send the returned data to ozontel rtp
-        RtpSender rtpSender = new RtpSender(rtpRemoteAddress, outboundRtpQueue, agentConfig);
+        DataSender rtpSender = new RtpSenderImpl(rtpRemoteAddress, outboundRtpQueue, agentConfig);
         executor.execute(rtpSender); //1 new thread started
 
         while (!agentState.getSipState().equals(SipState.DISCONNECTED)) {

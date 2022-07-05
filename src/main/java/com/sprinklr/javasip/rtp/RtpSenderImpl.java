@@ -1,15 +1,15 @@
 package com.sprinklr.javasip.rtp;
 
 import com.sprinklr.javasip.agent.AgentConfig;
+import com.sprinklr.javasip.agent.DataSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Queue;
 
 import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
@@ -17,9 +17,9 @@ import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
 /**
 Agent's RTP sender which sends data packets to Ozonetel in the RTP session
  */
-public class RtpSender implements Runnable {
+public class RtpSenderImpl implements DataSender {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RtpSender.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RtpSenderImpl.class);
 
     private final Queue<byte[]> outboundRtpQueue;
     private final RtpAddress rtpRemoteAddress;
@@ -34,7 +34,7 @@ public class RtpSender implements Runnable {
      * @param outboundRtpQueue The queue from which data is polled and sent to the remote destination
      * @param agentConfig The configuration of the Agent to whom this RtpSender entity belongs
      */
-    public RtpSender(RtpAddress rtpRemoteAddress, Queue<byte[]> outboundRtpQueue, AgentConfig agentConfig) {
+    public RtpSenderImpl(RtpAddress rtpRemoteAddress, Queue<byte[]> outboundRtpQueue, AgentConfig agentConfig) {
         this.rtpRemoteAddress = rtpRemoteAddress;
         this.outboundRtpQueue = outboundRtpQueue;
         this.agentConfig = agentConfig;
@@ -42,12 +42,17 @@ public class RtpSender implements Runnable {
 
     /**
      * Starts transmission of the data packets to be sent to the remote destination in the RTP session
-     * @throws InterruptedException
-     * @throws IOException
      */
-    public void start() throws InterruptedException, IOException {
+    @Override
+    public void start() {
 
-        InetAddress remoteRtpIp = InetAddress.getByName(rtpRemoteAddress.getAddress());
+        InetAddress remoteRtpIp = null;
+        try {
+            remoteRtpIp = InetAddress.getByName(rtpRemoteAddress.getAddress());
+        } catch (UnknownHostException e) {
+            LOGGER.error("UnknownHostException in {}: {}", agentConfig.getAgentName(), e.toString());
+            return;
+        }
         int remoteRtpPort = rtpRemoteAddress.getPort();
 
         try (DatagramSocket datagramSocket = new DatagramSocket()) {
@@ -62,6 +67,13 @@ public class RtpSender implements Runnable {
                 }
                 sendBytes(remoteRtpIp, remoteRtpPort, datagramSocket, data);
             }
+        } catch (IOException e) {
+            LOGGER.error("IOException in {}: {}", agentConfig.getAgentName(), e.toString());
+            return;
+        } catch (InterruptedException e) {
+            LOGGER.error("InterruptedException in {}: {}", agentConfig.getAgentName(), e.toString());
+            Thread.currentThread().interrupt();
+            return;
         }
         LOGGER.info("Stopping rtp transmission from {}", agentConfig.getAgentName());
     }
@@ -85,17 +97,7 @@ public class RtpSender implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            start();
-        } catch (InterruptedException e) {
-            LOGGER.error("{} interrupted in RtpSender", agentConfig.getAgentName());
-            Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            LOGGER.error("In RtpSender, {} alert! \n Cause: {} \n Stacktrace: {}", agentConfig.getAgentName(), e.getCause(), sw);
-        }
+        start();
     }
 
     /**

@@ -1,12 +1,11 @@
 package com.sprinklr.javasip.rtp;
 
 import com.sprinklr.javasip.agent.AgentConfig;
+import com.sprinklr.javasip.agent.DataReceiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.*;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
@@ -14,9 +13,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Agent's RTP receiver which receives data packets from Ozonetel in RTP session
  */
-public class RtpReceiver implements Runnable {
+public class RtpReceiverImpl implements DataReceiver {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiver.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiverImpl.class);
     private static final int RTP_BLOCK_SOCKET_TIME_MS = (int) TimeUnit.MILLISECONDS.toMillis(1000);
     private final Queue<byte[]> inboundRtpQueue;
     private final AgentConfig agentConfig;
@@ -27,18 +26,23 @@ public class RtpReceiver implements Runnable {
      * @param inboundRtpQueue The queue where the received Rtp packets are stored
      * @param agentConfig The configuration the Agent to whom this RtpReceiver entity belongs
      */
-    public RtpReceiver(Queue<byte[]> inboundRtpQueue, AgentConfig agentConfig) {
+    public RtpReceiverImpl(Queue<byte[]> inboundRtpQueue, AgentConfig agentConfig) {
         this.inboundRtpQueue = inboundRtpQueue;
         this.agentConfig = agentConfig;
     }
 
     /**
      * Starts listening at the specified port and address for Rtp Packets
-     * @throws IOException
      */
-    public void start() throws IOException {
+    public void start() {
 
-        InetAddress localRtpIp = InetAddress.getByName(agentConfig.getRtpLocalIp());
+        InetAddress localRtpIp = null;
+        try {
+            localRtpIp = InetAddress.getByName(agentConfig.getRtpLocalIp());
+        } catch (UnknownHostException e) {
+            LOGGER.error("UnknownHostException in {}: {}", agentConfig.getAgentName(), e.toString());
+            return;
+        }
 
         try (DatagramSocket serverSocket = new DatagramSocket(agentConfig.getRtpLocalPort(), localRtpIp)) {
 
@@ -47,6 +51,9 @@ public class RtpReceiver implements Runnable {
             while (!exit) {
                 readBytes(serverSocket);
             }
+        } catch (IOException e) {
+            LOGGER.error("IOException in {}: {}", agentConfig.getAgentName(), e.toString());
+            return;
         }
         LOGGER.info("{} stopped listening on udp:{}:{}", agentConfig.getAgentName(), agentConfig.getRtpLocalIp(), agentConfig.getRtpLocalPort());
     }
@@ -75,14 +82,7 @@ public class RtpReceiver implements Runnable {
      */
     @Override
     public void run() {
-        try {
-            start();
-        } catch (IOException e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            LOGGER.error("In RtpReceiver, {} alert! IOException: {}", agentConfig.getAgentName(), sw);
-        }
+        start();
     }
 
     /**
@@ -91,5 +91,4 @@ public class RtpReceiver implements Runnable {
     public void stop() {
         exit = true;
     }
-
 }
