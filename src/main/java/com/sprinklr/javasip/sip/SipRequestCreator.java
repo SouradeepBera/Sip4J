@@ -152,9 +152,6 @@ public class SipRequestCreator {
         authorizationHeader.setScheme(wwwAuthenticateHeader.getScheme());
         newRequest.addHeader(authorizationHeader);
 
-        CSeqHeader cSeqHeader = headerFactory.createCSeqHeader(cseqNmb, Request.REGISTER);
-        newRequest.setHeader(cSeqHeader);
-
         return newRequest;
     }
 }
