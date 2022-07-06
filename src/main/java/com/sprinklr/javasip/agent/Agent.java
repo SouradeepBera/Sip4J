@@ -102,7 +102,7 @@ public class Agent implements Runnable {
             try {
                 byte[] data = inboundRtpQueue.poll();
                 if (data == null) {
-                    Thread.sleep(SLEEP_CPU_TIME_MS); //sleep or use blocking queue, refer https://www.baeldung.com/java-concurrent-queues
+                    Thread.sleep(SLEEP_CPU_TIME_MS); //sleep to save cpu cycles or can replace by a blocking queue, refer https://www.baeldung.com/java-concurrent-queues
                     continue;
                 }
                 websocket.send(data);
