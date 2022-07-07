@@ -22,9 +22,9 @@ import java.util.Queue;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.sprinklr.sip4j.utils.Constants.SLEEP_CPU_TIME_MS;
 
@@ -35,7 +35,7 @@ public class Agent implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);
     private static final int WS_RECONNECT_CODE = 1006;
-    private static final int N_ENTITIES = 3;
+    private static final int N_HELPER_THREADS = 3;
     private AgentConfig agentConfig;
     private AgentState agentState;
 
@@ -61,12 +61,9 @@ public class Agent implements Runnable {
         Queue<byte[]> inboundRtpQueue = new ConcurrentLinkedQueue<>();
         Queue<byte[]> outboundRtpQueue = new ConcurrentLinkedQueue<>();
 
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
-        executor.setCorePoolSize(N_ENTITIES);
-        executor.setMaximumPoolSize(N_ENTITIES);
+        ExecutorService executor = Executors.newFixedThreadPool(N_HELPER_THREADS);
 
-        SipExtension sip;
-        sip = new SipExtension(agentState, agentConfig);
+        SipExtension sip = new SipExtension(agentState, agentConfig);
 
         /*
          * Refer to jain-sip-ri/gov.nist/javax/sip/SipStackImpl and src/main/java/com.spr/sip/Sip to understand threading
@@ -74,9 +71,7 @@ public class Agent implements Runnable {
          */
         Future<RtpAddress> rtpRemoteAddressFuture = executor.submit(sip);
 
-        RtpAddress rtpRemoteAddress;
-        rtpRemoteAddress = rtpRemoteAddressFuture.get();
-
+        RtpAddress rtpRemoteAddress = rtpRemoteAddressFuture.get();
         if (!(rtpRemoteAddress.getAddressType().equals(agentConfig.getRtpAddressType())) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.getRtpNetworkType()))) {
             throw new IllegalStateException("Rtp address type or network type not matching");
         }
@@ -86,8 +81,7 @@ public class Agent implements Runnable {
         executor.execute(rtpReceiver); //1 new thread started
 
         //connect websocket to botserver (make sure botserver is running)
-        Websocket websocket;
-        websocket = new Websocket(outboundRtpQueue, agentState, agentConfig);
+        Websocket websocket = new Websocket(outboundRtpQueue, agentState, agentConfig);
         websocket.connect(); //starts a read and write thread internally, 2 new threads started
 
         //send the returned data to ozontel rtp
