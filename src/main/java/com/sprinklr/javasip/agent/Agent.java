@@ -4,7 +4,6 @@ import com.sprinklr.javasip.rtp.RtpAddress;
 import com.sprinklr.javasip.rtp.RtpReceiverImpl;
 import com.sprinklr.javasip.rtp.RtpSenderImpl;
 import com.sprinklr.javasip.sip.SipExtension;
-import com.sprinklr.javasip.sip.SipAllFactories;
 import com.sprinklr.javasip.sip.SipState;
 import com.sprinklr.javasip.websocket.Websocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
