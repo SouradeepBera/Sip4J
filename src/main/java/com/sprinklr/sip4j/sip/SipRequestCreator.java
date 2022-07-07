@@ -137,7 +137,7 @@ public class SipRequestCreator {
         WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response.getHeader(WWWAuthenticateHeader.NAME);
         //Scheme of authorization should be Digest
         if (!AUTHENTICATION_SCHEME.equals(wwwAuthenticateHeader.getScheme())) {
-            throw new NoSuchAlgorithmException();
+            throw new SipIncorrectAuthenticationSchemeException(wwwAuthenticateHeader.getScheme() + " not valid. Expected " + AUTHENTICATION_SCHEME);
         }
         Request newRequest = createRegisterRequest();
         CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
