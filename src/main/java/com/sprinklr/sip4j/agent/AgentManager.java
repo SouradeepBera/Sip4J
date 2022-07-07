@@ -18,10 +18,6 @@ public class AgentManager {
         agentMapper.put(agentConfig.getAgentName(), agent);
     }
 
-    public Agent getAgentByConfig(AgentConfig agentConfig) {
-        return agentMapper.get(agentConfig.getAgentName());
-    }
-
     public Agent getAgentByName(String agentName) {
         return agentMapper.get(agentName);
     }
