@@ -51,15 +51,16 @@ public class SipRequestCreator {
             LOGGER.error("ParseException, cannot create Allow Header. Empty header will be created. {}", e.toString());
         }
     }
-    private final SipProvider sipProvider;
     private final ListeningPoint listeningPoint;
     private final AgentConfig agentConfig;
+    private final CallIdHeader callIdHeader;
     //separately keep track of cseq number since REGISTER not part of dialog
     private long cseqNmb = 1;
 
     public SipRequestCreator(SipProvider sipProvider, AgentConfig agentConfig) {
-        this.sipProvider = sipProvider;
         this.listeningPoint = sipProvider.getListeningPoint(agentConfig.getTransportMode());
+        // Create a new CallId header unique for this call
+        this.callIdHeader = sipProvider.getNewCallId();
         this.agentConfig = agentConfig;
     }
 
@@ -83,9 +84,6 @@ public class SipRequestCreator {
         // Since REGISTER request is initiated by you, your via header will be the only one in the list, hence the use of Collections.singletonList
         ViaHeader viaHeader = HEADER_FACTORY.createViaHeader(listeningPoint.getIPAddress(), listeningPoint.getPort(), agentConfig.getTransportMode(), null);
         List<ViaHeader> viaHeaders = Collections.singletonList(viaHeader);
-
-        // Create a new CallId header
-        CallIdHeader callIdHeader = sipProvider.getNewCallId();
 
         // Create a new Cseq header
         CSeqHeader cSeqHeader = HEADER_FACTORY.createCSeqHeader(cseqNmb, Request.REGISTER);
@@ -147,9 +145,6 @@ public class SipRequestCreator {
             throw new SipIncorrectAuthenticationSchemeException(wwwAuthenticateHeader.getScheme() + " not valid. Expected " + AUTHENTICATION_SCHEME);
         }
         Request newRequest = createRegisterRequest();
-        CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
-        //All registrations from a UAC SHOULD use the same Call-ID header field value for registrations sent to a particular registrar
-        newRequest.setHeader(oldCallIdHeader);
 
         String userName = agentConfig.getSipLocalUsername();
         String realm = wwwAuthenticateHeader.getRealm();
