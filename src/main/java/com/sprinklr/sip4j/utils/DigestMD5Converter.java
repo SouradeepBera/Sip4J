@@ -25,9 +25,6 @@ public class DigestMD5Converter {
         }
     }
 
-    /**
-     * Private constructor since it is a utility class
-     */
     private DigestMD5Converter() {
         throw new IllegalStateException("Utility class");
     }

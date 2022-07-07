@@ -16,9 +16,6 @@ public class AudioHelper {
 
     private static final String WAV_EXT = "wav";
 
-    /**
-     * Private constructor since it is a utility class
-     */
     private AudioHelper() {
         throw new IllegalStateException("Utility class");
     }
