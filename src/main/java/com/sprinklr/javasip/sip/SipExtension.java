@@ -10,7 +10,6 @@ import javax.sdp.Connection;
 import javax.sdp.Media;
 import javax.sdp.MediaDescription;
 import javax.sdp.SdpException;
-import javax.sdp.SdpFactory;
 import javax.sdp.SdpParseException;
 import javax.sdp.SessionDescription;
 
@@ -37,12 +36,9 @@ import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransportNotSupportedException;
 import javax.sip.address.Address;
-import javax.sip.address.AddressFactory;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.HeaderFactory;
-import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -57,6 +53,11 @@ import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import static com.sprinklr.javasip.sip.SipAllFactories.ADDRESS_FACTORY;
+import static com.sprinklr.javasip.sip.SipAllFactories.HEADER_FACTORY;
+import static com.sprinklr.javasip.sip.SipAllFactories.MESSAGE_FACTORY;
+import static com.sprinklr.javasip.sip.SipAllFactories.SDP_FACTORY;
+import static com.sprinklr.javasip.sip.SipAllFactories.SIP_FACTORY;
 import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
 
 /**
@@ -66,26 +67,6 @@ import static com.sprinklr.javasip.utils.Constants.SLEEP_CPU_TIME_MS;
 public class SipExtension implements SipListener, Callable<RtpAddress> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SipExtension.class);
-
-    /**
-     * The SdpFactory enables applications to encode and decode SDP messages. The SdpFactory can be used to construct a SessionDescription object programmatically and also from Strings.
-     */
-    private final SdpFactory sdpFactory;
-    /**
-     * This interface provides factory methods that allow an application to create Address objects, URI's, SipURI's and TelURL's from a particular implementation of this specification. It is a singleton
-     */
-    private final AddressFactory addressFactory;
-    /**
-     * This interface provides factory methods that allow an application to create Request and Response messages from a particular implementation of JAIN SIP. It is a singleton
-     */
-    private final MessageFactory messageFactory;
-    /**
-     * This interface provides factory methods that allow an application to create Header object from a particular implementation of JAIN SIP. It is a singleton
-     */
-    private final HeaderFactory headerFactory;
-    /**
-     * Defines the methods that are to be used by an application implementing the SipListener interface to control the architecture and setup of the SIP stack.
-     */
     private final SipStack sipStack;
     /**
      * Maintains states (SIP state and Websocket state) of the agent
@@ -135,7 +116,6 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
     /**
      * Initialises a SipExtension for an Agent. Assigns factories, registers it to the registrar server and schedules its future registrations
-     * @param sipAllFactories Singleton object encapsulating all the factory methods
      * @param agentState Maintains states (SIP state and Websocket state) of the agent
      * @param agentConfig Represents configuration of an Agent, as read from the config file
      * @throws ParseException
@@ -145,19 +125,14 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
      * @throws TransportNotSupportedException
      * @throws InvalidArgumentException
      */
-    public SipExtension(SipAllFactories sipAllFactories, AgentState agentState, AgentConfig agentConfig) throws ParseException, TooManyListenersException, ObjectInUseException, PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException {
+    public SipExtension(AgentState agentState, AgentConfig agentConfig) throws ParseException, TooManyListenersException, ObjectInUseException, PeerUnavailableException, TransportNotSupportedException, InvalidArgumentException {
 
         this.agentState = agentState;
         this.agentConfig = agentConfig;
-        SipFactory sipFactory = sipAllFactories.getSipFactory();
-        this.sdpFactory = sipAllFactories.getSdpFactory();
-        this.messageFactory = sipAllFactories.getMessageFactory();
-        this.addressFactory = sipAllFactories.getAddressFactory();
-        this.headerFactory = sipAllFactories.getHeaderFactory();
 
         Properties properties = new Properties();
         properties.setProperty("javax.sip.STACK_NAME", agentConfig.getAgentName());
-        sipStack = sipFactory.createSipStack(properties);
+        sipStack = SIP_FACTORY.createSipStack(properties);
 
         /*
         This interface represents a unique IP network listening point, which consists of port transport and IP.
@@ -168,7 +143,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         sipProvider.addSipListener(this);
 
         //use SipRequestCreator to create any requests to be sent from our sip entity. Currently, only REGISTER request is sent.
-        sipRequestCreator = new SipRequestCreator(sipProvider, addressFactory, messageFactory, headerFactory, agentConfig);
+        sipRequestCreator = new SipRequestCreator(sipProvider, agentConfig);
         registerRequest = sipRequestCreator.createRegisterRequest();
 
         timer = new Timer();
@@ -316,7 +291,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
         try {
             LOGGER.info("{} (UAS) sending TRYING", agentConfig.getAgentName());
-            Response tryingResponse = messageFactory.createResponse(Response.RINGING, request);
+            Response tryingResponse = MESSAGE_FACTORY.createResponse(Response.RINGING, request);
 
             if (serverTransaction == null) {
                 LOGGER.info("Found null serverTransaction while processing INVITE, creating from Sip Provider in {}", agentConfig.getAgentName());
@@ -327,11 +302,11 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
             agentState.setSipState(SipState.CONNECTING);
 
-            Response okResponse = messageFactory.createResponse(Response.OK, request);
+            Response okResponse = MESSAGE_FACTORY.createResponse(Response.OK, request);
             //Contact Header is mandatory for the OK to the INVITE
-            SipURI contactURI = addressFactory.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
-            Address contactAddress = addressFactory.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
-            ContactHeader contactHeader = headerFactory.createContactHeader(contactAddress);
+            SipURI contactURI = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
+            Address contactAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
+            ContactHeader contactHeader = HEADER_FACTORY.createContactHeader(contactAddress);
             okResponse.addHeader(contactHeader);
             //set other data to be conveyed to Ozonetel using okResponse.setContent(). Also add ContentTypeHeader and other headers as required
             this.inviteServerTransaction = serverTransaction;
@@ -372,7 +347,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
         LOGGER.info("{} Local party = {}", agentConfig.getAgentName(), serverTransaction.getDialog().getLocalParty());
         try {
             LOGGER.info("{} (UAS):  got a BYE sending OK.", agentConfig.getAgentName());
-            Response response = messageFactory.createResponse(200, request);
+            Response response = MESSAGE_FACTORY.createResponse(200, request);
             serverTransaction.sendResponse(response);
 
             agentState.setSipState(SipState.DISCONNECTED);
@@ -400,12 +375,12 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
                 LOGGER.warn("Received null serverTransaction in {}, treating as stray response", agentConfig.getAgentName());
                 return;
             }
-            Response response = messageFactory.createResponse(Response.OK, request);
+            Response response = MESSAGE_FACTORY.createResponse(Response.OK, request);
             //send 200 response for CANCEL request
             serverTransaction.sendResponse(response);
             if (serverTransaction.getDialog().getState() != DialogState.CONFIRMED) {
                 //send 487 response for the corresponding invite request, client then sends an ACK ending the transaction
-                response = messageFactory.createResponse(Response.REQUEST_TERMINATED, inviteRequest);
+                response = MESSAGE_FACTORY.createResponse(Response.REQUEST_TERMINATED, inviteRequest);
                 inviteServerTransaction.sendResponse(response);
                 agentState.setSipState(SipState.DISCONNECTED);
                 shutDown();
@@ -472,7 +447,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     public SessionDescription extractSDP(RequestEvent requestEvent) throws SdpParseException {
         Request request = requestEvent.getRequest();
         byte[] sdpContent = (byte[]) request.getContent();
-        return sdpFactory.createSessionDescription(new String(sdpContent));
+        return SDP_FACTORY.createSessionDescription(new String(sdpContent));
     }
 
     /**

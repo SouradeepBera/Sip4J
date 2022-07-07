@@ -59,9 +59,6 @@ public class Agent implements Runnable {
      */
     public void start() throws PeerUnavailableException, TransportNotSupportedException, TooManyListenersException, InvalidArgumentException, ObjectInUseException, ParseException, ExecutionException, InterruptedException, URISyntaxException {
 
-        SipAllFactories sipAllFactories;
-        sipAllFactories = SipAllFactories.getInstance();
-
         Queue<byte[]> inboundRtpQueue = new ConcurrentLinkedQueue<>();
         Queue<byte[]> outboundRtpQueue = new ConcurrentLinkedQueue<>();
 
@@ -70,7 +67,7 @@ public class Agent implements Runnable {
         executor.setMaximumPoolSize(N_ENTITIES);
 
         SipExtension sip;
-        sip = new SipExtension(sipAllFactories, agentState, agentConfig);
+        sip = new SipExtension(agentState, agentConfig);
 
         /*
          * Refer to jain-sip-ri/gov.nist/javax/sip/SipStackImpl and src/main/java/com.spr/sip/Sip to understand threading

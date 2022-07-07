@@ -1,5 +1,8 @@
 package com.sprinklr.javasip.sip;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.sdp.SdpFactory;
 import javax.sip.PeerUnavailableException;
 import javax.sip.SipFactory;
@@ -8,55 +11,56 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
 /**
- * Singleton which initialises sip+sdp factories
+ * Utility class which initialises sip+sdp factories
  */
 public class SipAllFactories {
 
-    private static SipAllFactories singleInstance = null;
-    private final SipFactory sipFactory;
-    private final SdpFactory sdpFactory;
-    private final AddressFactory addressFactory;
-    private final MessageFactory messageFactory;
-    private final HeaderFactory headerFactory;
-
-    private SipAllFactories() throws PeerUnavailableException {
-        sipFactory = SipFactory.getInstance();
-        sipFactory.setPathName("gov.nist");
-        sdpFactory = SdpFactory.getInstance();
-        headerFactory = sipFactory.createHeaderFactory();
-        addressFactory = sipFactory.createAddressFactory();
-        messageFactory = sipFactory.createMessageFactory();
+    private static final Logger LOGGER = LoggerFactory.getLogger(SipAllFactories.class);
+    public static final SipFactory SIP_FACTORY = SipFactory.getInstance();
+    static {
+        SIP_FACTORY.setPathName("gov.nist");
     }
 
-    /**
-     * Returns the single instance of this class. If no instance is created yet, it creates a new one
-     * @return the single instance of this class
-     * @throws PeerUnavailableException
-     */
-    public static SipAllFactories getInstance() throws PeerUnavailableException {
-        if (singleInstance == null) {
-            singleInstance = new SipAllFactories();
+    public static final SdpFactory SDP_FACTORY = SdpFactory.getInstance();
+
+    public static final AddressFactory ADDRESS_FACTORY;
+    static {
+        AddressFactory tmpAddressFactory;
+        try {
+            tmpAddressFactory = SIP_FACTORY.createAddressFactory();
+        } catch (PeerUnavailableException e) {
+            LOGGER.error("Peer Unavailable Exception for Address Factory, factory not initialised : {}", e.toString());
+            tmpAddressFactory = null;
         }
-        return singleInstance;
+        ADDRESS_FACTORY = tmpAddressFactory;
     }
 
-    public SipFactory getSipFactory() {
-        return sipFactory;
+    public static final MessageFactory MESSAGE_FACTORY;
+    static {
+        MessageFactory tmpMessageFactory;
+        try {
+            tmpMessageFactory = SIP_FACTORY.createMessageFactory();
+        } catch (PeerUnavailableException e) {
+            LOGGER.error("Peer Unavailable Exception for Message Factory, factory not initialised : {}", e.toString());
+            tmpMessageFactory = null;
+        }
+        MESSAGE_FACTORY = tmpMessageFactory;
     }
 
-    public SdpFactory getSdpFactory() {
-        return sdpFactory;
+    public static final HeaderFactory HEADER_FACTORY;
+
+    static {
+        HeaderFactory tmpHeaderFactory;
+        try {
+            tmpHeaderFactory = SIP_FACTORY.createHeaderFactory();
+        } catch (PeerUnavailableException e) {
+            LOGGER.error("Peer Unavailable Exception for Header Factory, factory not initialised : {}", e.toString());
+            tmpHeaderFactory = null;
+        }
+        HEADER_FACTORY = tmpHeaderFactory;
     }
 
-    public AddressFactory getAddressFactory() {
-        return addressFactory;
-    }
-
-    public MessageFactory getMessageFactory() {
-        return messageFactory;
-    }
-
-    public HeaderFactory getHeaderFactory() {
-        return headerFactory;
+    private SipAllFactories() {
+        throw new IllegalStateException("Utility class");
     }
 }
