@@ -3,6 +3,8 @@ package com.sprinklr.sip4j.sip;
 import com.sprinklr.sip4j.agent.AgentConfig;
 import com.sprinklr.sip4j.utils.DigestMD5Converter;
 import gov.nist.javax.sip.header.AllowList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
@@ -38,8 +40,18 @@ import static com.sprinklr.sip4j.sip.SipAllFactories.MESSAGE_FACTORY;
  */
 public class SipRequestCreator {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SipRequestCreator.class);
     private static final String AUTHENTICATION_SCHEME = "Digest";
     private static final List<String> SIP_ALLOWED_METHODS = Collections.unmodifiableList(Arrays.asList(Request.INVITE, Request.BYE, Request.CANCEL, Request.ACK));
+    private static final AllowList ALLOW_LIST;
+    static{
+        ALLOW_LIST = new AllowList();
+        try {
+            ALLOW_LIST.setMethods(SIP_ALLOWED_METHODS);
+        } catch (ParseException e) {
+            LOGGER.error("ParseException, cannot create Allow Header. Empty header will be created. {}", e.toString());
+        }
+    }
     private final SipProvider sipProvider;
     private final ListeningPoint listeningPoint;
     private final AgentConfig agentConfig;
@@ -101,9 +113,7 @@ public class SipRequestCreator {
         request.addHeader(contactHeader);
 
         // Create Allow header
-        AllowList allowList = new AllowList();
-        allowList.setMethods(SIP_ALLOWED_METHODS);
-        request.addHeader(allowList);
+        request.addHeader(ALLOW_LIST);
 
         // Create an Expires header
         ExpiresHeader expiresHeader = HEADER_FACTORY.createExpiresHeader(agentConfig.getSipRegisterExpiryTimeSec());
