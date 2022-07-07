@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class RtpReceiverImpl implements DataReceiver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RtpReceiverImpl.class);
-    private static final int RTP_BLOCK_SOCKET_TIME_MS = (int) TimeUnit.MILLISECONDS.toMillis(1000);
+    private static final int RTP_BLOCK_SOCKET_TIME_MS = (int) TimeUnit.SECONDS.toMillis(1);
     private final Queue<byte[]> inboundRtpQueue;
     private final AgentConfig agentConfig;
     private volatile boolean exit = false;
