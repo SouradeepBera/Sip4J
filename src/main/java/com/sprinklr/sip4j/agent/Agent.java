@@ -73,7 +73,9 @@ public class Agent implements Runnable {
 
         RtpAddress rtpRemoteAddress = rtpRemoteAddressFuture.get();
         if (!(rtpRemoteAddress.getAddressType().equals(agentConfig.getRtpAddressType())) || !(rtpRemoteAddress.getNetworkType().equals(agentConfig.getRtpNetworkType()))) {
-            throw new IllegalStateException("Rtp address type or network type not matching");
+            throw new IllegalStateException("Rtp address type or network type not matching" +
+                    "Address type received: " + rtpRemoteAddress.getAddressType() + " expected: " + agentConfig.getRtpAddressType() +
+                    "Network type received: " + rtpRemoteAddress.getNetworkType() + " expected: " + agentConfig.getRtpNetworkType());
         }
 
         //start listening on rtp port for rtp data from ozonetel (send data only after this is running)

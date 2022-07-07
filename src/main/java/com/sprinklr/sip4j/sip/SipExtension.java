@@ -111,7 +111,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     /**
      * Flag variable specifying whether or not the remote RTP address has been set
      */
-    private volatile boolean isCallableReady = false;
+    private volatile boolean isRemoteRtpAddressSet = false;
 
     /**
      * Initialises a SipExtension for an Agent. Assigns factories, registers it to the registrar server and schedules its future registrations
@@ -160,7 +160,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
      */
     @Override
     public RtpAddress call() throws InterruptedException {
-        while (!isCallableReady) {
+        while (!isRemoteRtpAddressSet) {
             //wait for rtpRemoteAddress to be initialised
             Thread.sleep(SLEEP_CPU_TIME_MS); //sleeping for specified time to save cpu cycles
         }
@@ -284,20 +284,24 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
     public void processInviteRequest(RequestEvent requestEvent, ServerTransaction serverTransaction) {
 
         Request request = requestEvent.getRequest();
+        this.inviteRequest = request;
 
-        if (!agentState.getSipState().equals(SipState.REGISTERED))
+        if (!agentState.getSipState().equals(SipState.REGISTERED)) {
+            LOGGER.warn("Agent {} not in registered state, ignoring INVITE request", agentConfig.getAgentName());
             return;
+        }
 
         try {
             LOGGER.info("{} (UAS) sending TRYING", agentConfig.getAgentName());
-            Response tryingResponse = MESSAGE_FACTORY.createResponse(Response.RINGING, request);
 
             if (serverTransaction == null) {
                 LOGGER.info("Found null serverTransaction while processing INVITE, creating from Sip Provider in {}", agentConfig.getAgentName());
                 serverTransaction = sipProvider.getNewServerTransaction(request);
             }
+            this.inviteServerTransaction = serverTransaction;
 
-            serverTransaction.sendResponse(tryingResponse);
+            Response ringingResponse = MESSAGE_FACTORY.createResponse(Response.RINGING, request);
+            serverTransaction.sendResponse(ringingResponse);
 
             agentState.setSipState(SipState.CONNECTING);
 
@@ -306,12 +310,9 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
             SipURI contactURI = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
             Address contactAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
             ContactHeader contactHeader = HEADER_FACTORY.createContactHeader(contactAddress);
-            okResponse.addHeader(contactHeader);
             //set other data to be conveyed to Ozonetel using okResponse.setContent(). Also add ContentTypeHeader and other headers as required
-            this.inviteServerTransaction = serverTransaction;
+            okResponse.addHeader(contactHeader);
             LOGGER.info("Invite transaction id: {}", this.inviteServerTransaction);
-
-            this.inviteRequest = request;
 
             if (inviteServerTransaction.getState() != TransactionState.COMPLETED) {
                 LOGGER.info("Dialog state in {} before 200: {}", agentConfig.getAgentName(), inviteServerTransaction.getDialog().getState());
@@ -323,12 +324,10 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
                 Media media = extractMedia(remoteSdp);
                 Connection connection = extractConnection(remoteSdp);
                 rtpRemoteAddress = new RtpAddress(media.getMediaPort(), connection.getAddress(), connection.getAddressType(), connection.getNetworkType());
-                isCallableReady = true;
+                isRemoteRtpAddressSet = true;
                 LOGGER.info("{} set remote rtp address for Agent", agentConfig.getAgentName());
-
                 agentState.setSipState(SipState.CONNECTED);
             }
-
         } catch (Exception ex) {
             agentState.setSipState(SipState.DISCONNECTED);
             LOGGER.error("Error while processing INVITE request in {}: {}", agentConfig.getAgentName(), ex.toString());
@@ -465,7 +464,7 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
      * @throws SdpException
      */
     public Media extractMedia(SessionDescription sdp) throws SdpException {
-        Vector<MediaDescription> mediaDescriptions = sdp.getMediaDescriptions(false);
+        @SuppressWarnings("unchecked") Vector<MediaDescription> mediaDescriptions = sdp.getMediaDescriptions(false);
         MediaDescription mediaDescription = mediaDescriptions.get(0);
         return mediaDescription.getMedia();
     }
