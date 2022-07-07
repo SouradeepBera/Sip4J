@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sprinklr</groupId>
-	<artifactId>javasip</artifactId>
+	<artifactId>Sip4J</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>javasip</name>
+	<name>Sip4J</name>
 	<description>Project for Sip Client in java</description>
 	<properties>
 		<java.version>1.8</java.version>
