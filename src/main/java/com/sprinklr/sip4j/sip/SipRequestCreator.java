@@ -81,7 +81,7 @@ public class SipRequestCreator {
         Address toNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), toAddress);
         ToHeader toHeader = HEADER_FACTORY.createToHeader(toNameAddress, null);
 
-        // create Register URI
+        // create Register URI - this figures out where to send the request V.IMP
         //The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
         SipURI registerURI = ADDRESS_FACTORY.createSipURI(null, agentConfig.getSipRegistrarIp() + ":" + agentConfig.getSipRegistrarPort());
 
