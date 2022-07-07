@@ -8,10 +8,10 @@ public interface DataReceiver extends Runnable{
     /**
      * Starts the receiver
      */
-    public void start();
+    void start();
 
     /**
      * Stop the receiver
      */
-    public void stop();
+    void stop();
 }

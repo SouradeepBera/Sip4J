@@ -8,10 +8,10 @@ public interface DataSender extends Runnable {
     /**
      * Starts the sender
      */
-    public void start();
+    void start();
 
     /**
      * Stops the sender
      */
-    public void stop();
+    void stop();
 }
