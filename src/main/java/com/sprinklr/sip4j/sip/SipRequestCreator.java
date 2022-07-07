@@ -110,19 +110,19 @@ public class SipRequestCreator {
         return request;
     }
 
-    private ContactHeader getContactHeader() throws ParseException {
+    public ContactHeader getContactHeader() throws ParseException {
         SipURI contactURI = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
         Address contactAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
         return HEADER_FACTORY.createContactHeader(contactAddress);
     }
 
-    private ToHeader getToHeader() throws ParseException {
+    public ToHeader getToHeader() throws ParseException {
         SipURI toAddress = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
         Address toNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), toAddress);
         return HEADER_FACTORY.createToHeader(toNameAddress, null);
     }
 
-    private FromHeader getFromHeader() throws ParseException {
+    public FromHeader getFromHeader() throws ParseException {
         SipURI fromAddress = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
         Address fromNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), fromAddress);
         return HEADER_FACTORY.createFromHeader(fromNameAddress, agentConfig.getSipLocalTag());

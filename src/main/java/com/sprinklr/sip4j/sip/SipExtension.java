@@ -307,11 +307,8 @@ public class SipExtension implements SipListener, Callable<RtpAddress> {
 
             Response okResponse = MESSAGE_FACTORY.createResponse(Response.OK, request);
             //Contact Header is mandatory for the OK to the INVITE
-            SipURI contactURI = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
-            Address contactAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
-            ContactHeader contactHeader = HEADER_FACTORY.createContactHeader(contactAddress);
             //set other data to be conveyed to Ozonetel using okResponse.setContent(). Also add ContentTypeHeader and other headers as required
-            okResponse.addHeader(contactHeader);
+            okResponse.addHeader(sipRequestCreator.getContactHeader());
             LOGGER.info("Invite transaction id: {}", this.inviteServerTransaction);
 
             if (inviteServerTransaction.getState() != TransactionState.COMPLETED) {
