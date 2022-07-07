@@ -4,9 +4,9 @@
 
 ### What it does?
 
-**javasip** was developed for replacing JsSip in Java, using SIP+SDP for signalling and RTP+Websocket
+**Sip4J** was developed for replacing JsSip in Java, using SIP+SDP for signalling and RTP+Websocket
 for media transfer.\
-Although **javasip** was specifically designed for the Sprinklr usecase, it can very easily be
+Although **Sip4J** was specifically designed for the Sprinklr usecase, it can very easily be
 modified and extended to create a high-level sip library for Java.
 
 ---
@@ -23,7 +23,7 @@ back to Ozonetel using the RTP session.
 
 ---
 
-## Using javasip
+## Using Sip4J
 
 ---
 
