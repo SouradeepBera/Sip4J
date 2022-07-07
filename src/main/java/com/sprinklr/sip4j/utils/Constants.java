@@ -1,7 +1,5 @@
 package com.sprinklr.sip4j.utils;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Define values which remain constant throughout execution across all Agents and all entities of an Agent
  */
