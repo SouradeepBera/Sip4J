@@ -25,7 +25,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -71,25 +70,19 @@ public class SipRequestCreator {
      * @throws InvalidArgumentException
      */
     public Request createRegisterRequest() throws ParseException, InvalidArgumentException {
-        //create from header
-        SipURI fromAddress = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
-        Address fromNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), fromAddress);
-        FromHeader fromHeader = HEADER_FACTORY.createFromHeader(fromNameAddress, agentConfig.getSipLocalTag());
+        FromHeader fromHeader = getFromHeader();
 
-        // create to Header
-        SipURI toAddress = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
-        Address toNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), toAddress);
-        ToHeader toHeader = HEADER_FACTORY.createToHeader(toNameAddress, null);
+        ToHeader toHeader = getToHeader();
 
         // create Register URI - this figures out where to send the request V.IMP
-        //The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
+        // The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
         SipURI registerURI = ADDRESS_FACTORY.createSipURI(null, agentConfig.getSipRegistrarIp() + ":" + agentConfig.getSipRegistrarPort());
 
-        // Create ViaHeaders
-        ArrayList<ViaHeader> viaHeaders = new ArrayList<>();
+        // Create ViaHeaders - this figures out where the responses to this request are to be sent
+        // If via headers are already existing, add your current via header on top of list.
+        // Since REGISTER request is initiated by you, your via header will be the only one in the list, hence the use of Collections.singletonList
         ViaHeader viaHeader = HEADER_FACTORY.createViaHeader(listeningPoint.getIPAddress(), listeningPoint.getPort(), agentConfig.getTransportMode(), null);
-        // add via headers
-        viaHeaders.add(viaHeader);
+        List<ViaHeader> viaHeaders = Collections.singletonList(viaHeader);
 
         // Create a new CallId header
         CallIdHeader callIdHeader = sipProvider.getNewCallId();
@@ -101,15 +94,11 @@ public class SipRequestCreator {
         MaxForwardsHeader maxForwards = HEADER_FACTORY.createMaxForwardsHeader(70);
 
         // Create the request.
-        Request request = MESSAGE_FACTORY.createRequest(registerURI,
-                Request.REGISTER, callIdHeader, cSeqHeader, fromHeader,
-                toHeader, viaHeaders, maxForwards);
+        Request request = MESSAGE_FACTORY.createRequest(registerURI, Request.REGISTER, callIdHeader, cSeqHeader, fromHeader, toHeader, viaHeaders, maxForwards);
 
         // Create Contact header after creating the contact address.
         //where to contact, differs from FROM header, refer https://stackoverflow.com/questions/31034422/what-is-the-difference-in-contact-and-from-header
-        SipURI contactURI = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
-        Address contactAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
-        ContactHeader contactHeader = HEADER_FACTORY.createContactHeader(contactAddress);
+        ContactHeader contactHeader = getContactHeader();
         request.addHeader(contactHeader);
 
         // Create Allow header
@@ -121,6 +110,24 @@ public class SipRequestCreator {
 
         cseqNmb++;
         return request;
+    }
+
+    private ContactHeader getContactHeader() throws ParseException {
+        SipURI contactURI = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalIp() + ":" + agentConfig.getSipLocalPort());
+        Address contactAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), contactURI);
+        return HEADER_FACTORY.createContactHeader(contactAddress);
+    }
+
+    private ToHeader getToHeader() throws ParseException {
+        SipURI toAddress = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
+        Address toNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), toAddress);
+        return HEADER_FACTORY.createToHeader(toNameAddress, null);
+    }
+
+    private FromHeader getFromHeader() throws ParseException {
+        SipURI fromAddress = ADDRESS_FACTORY.createSipURI(agentConfig.getSipLocalUsername(), agentConfig.getSipLocalRealm());
+        Address fromNameAddress = ADDRESS_FACTORY.createAddress(agentConfig.getSipLocalDisplayName(), fromAddress);
+        return HEADER_FACTORY.createFromHeader(fromNameAddress, agentConfig.getSipLocalTag());
     }
 
     /**
