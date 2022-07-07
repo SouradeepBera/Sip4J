@@ -9,7 +9,7 @@ sipLocalRealm: sprinklr.com
 sipLocalDisplayName: soura
 sipRegistrarIp: 127.0.0.1
 sipRegistrarPort: '5062'
-sipRegisterExpiryTimeSec: '3600'
+sipRegisterExpiryTimeSec: '3600' #expiry time can be anything, 0 means no expiry
 rtpLocalPort: '6026'
 rtpLocalIp: 192.168.1.8
 rtpAddressType: IP4
