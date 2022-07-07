@@ -43,7 +43,8 @@ public class SipRequestCreator {
     private final SipProvider sipProvider;
     private final ListeningPoint listeningPoint;
     private final AgentConfig agentConfig;
-    private long cseqNmb = 1; //separately keep track of cseq number since REGISTER not part of dialog
+    //separately keep track of cseq number since REGISTER not part of dialog
+    private long cseqNmb = 1;
 
     public SipRequestCreator(SipProvider sipProvider, AgentConfig agentConfig) {
         this.sipProvider = sipProvider;
@@ -69,7 +70,8 @@ public class SipRequestCreator {
         ToHeader toHeader = HEADER_FACTORY.createToHeader(toNameAddress, null);
 
         // create Register URI
-        SipURI registerURI = ADDRESS_FACTORY.createSipURI(null, agentConfig.getSipRegistrarIp() + ":" + agentConfig.getSipRegistrarPort()); //The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
+        //The "userinfo" and "@" components of the SIP URI MUST NOT be present, RFC 3261
+        SipURI registerURI = ADDRESS_FACTORY.createSipURI(null, agentConfig.getSipRegistrarIp() + ":" + agentConfig.getSipRegistrarPort());
 
         // Create ViaHeaders
         ArrayList<ViaHeader> viaHeaders = new ArrayList<>();
@@ -83,7 +85,7 @@ public class SipRequestCreator {
         // Create a new Cseq header
         CSeqHeader cSeqHeader = HEADER_FACTORY.createCSeqHeader(cseqNmb, Request.REGISTER);
 
-        // Create a new MaxForwardsHeader
+        // Create a new MaxForwardsHeader (convention is 70, but can be anything)
         MaxForwardsHeader maxForwards = HEADER_FACTORY.createMaxForwardsHeader(70);
 
         // Create the request.
@@ -121,13 +123,16 @@ public class SipRequestCreator {
      */
     public Request createRegisterRequestWithCredentials(Response response) throws ParseException, InvalidArgumentException, NoSuchAlgorithmException {
 
-        WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response.getHeader(WWWAuthenticateHeader.NAME); //names of headers in last line of respective header file in jain-sip-ri
-        if (!AUTHENTICATION_SCHEME.equals(wwwAuthenticateHeader.getScheme())) { //Scheme of authorization should be Digest
+        //names of headers in last line of respective header file in jain-sip-ri
+        WWWAuthenticateHeader wwwAuthenticateHeader = (WWWAuthenticateHeader) response.getHeader(WWWAuthenticateHeader.NAME);
+        //Scheme of authorization should be Digest
+        if (!AUTHENTICATION_SCHEME.equals(wwwAuthenticateHeader.getScheme())) {
             throw new NoSuchAlgorithmException();
         }
         Request newRequest = createRegisterRequest();
         CallIdHeader oldCallIdHeader = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
-        newRequest.setHeader(oldCallIdHeader); //All registrations from a UAC SHOULD use the same Call-ID header field value for registrations sent to a particular registrar
+        //All registrations from a UAC SHOULD use the same Call-ID header field value for registrations sent to a particular registrar
+        newRequest.setHeader(oldCallIdHeader);
 
         String userName = agentConfig.getSipLocalUsername();
         String realm = wwwAuthenticateHeader.getRealm();
