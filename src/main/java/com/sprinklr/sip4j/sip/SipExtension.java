@@ -34,10 +34,7 @@ import javax.sip.Transaction;
 import javax.sip.TransactionState;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransportNotSupportedException;
-import javax.sip.address.Address;
-import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
-import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -52,8 +49,6 @@ import java.util.Vector;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import static com.sprinklr.sip4j.sip.SipAllFactories.ADDRESS_FACTORY;
-import static com.sprinklr.sip4j.sip.SipAllFactories.HEADER_FACTORY;
 import static com.sprinklr.sip4j.sip.SipAllFactories.MESSAGE_FACTORY;
 import static com.sprinklr.sip4j.sip.SipAllFactories.SDP_FACTORY;
 import static com.sprinklr.sip4j.sip.SipAllFactories.SIP_FACTORY;
