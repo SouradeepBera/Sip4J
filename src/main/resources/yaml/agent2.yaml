@@ -3,7 +3,7 @@ transportMode: udp
 password: 123456
 agentName: Agent_2
 sipLocalIp: 127.0.0.1
-sipLocalPort: '5072' #currently each Agent has seperate port
+sipLocalPort: '5072' #currently each Agent has seperate port, for single/few ports usage check the doc under the ppt folder
 sipLocalUsername: souradeep.bera
 sipLocalRealm: sprinklr.com
 sipLocalDisplayName: soura
