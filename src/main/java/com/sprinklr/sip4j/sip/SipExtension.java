@@ -61,6 +61,9 @@ import static com.sprinklr.sip4j.utils.Constants.SLEEP_CPU_TIME_MS;
 public class SipExtension implements SipListener, Callable<RtpAddress> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SipExtension.class);
+    /**
+     * Defines the methods that are to be used by an application implementing the SipListener interface to control the architecture and setup of the SIP stack.
+     */
     private final SipStack sipStack;
     /**
      * Maintains states (SIP state and Websocket state) of the agent
