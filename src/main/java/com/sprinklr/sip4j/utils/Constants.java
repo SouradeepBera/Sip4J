@@ -1,7 +1,7 @@
 package com.sprinklr.sip4j.utils;
 
 /**
- * Define values which remain constant throughout execution across all Agents and all entities of an Agent
+ * Define values which remain constant throughout execution across all agents and all entities of an agent
  */
 public class Constants {
 
