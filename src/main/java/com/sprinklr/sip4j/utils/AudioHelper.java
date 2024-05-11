@@ -21,7 +21,7 @@ public class AudioHelper {
     }
 
     /**
-     * Generates an audio file from the stream. The file must be a WAV file.
+     * Generates an audio file from the stream. The file should be a WAV file.
      *
      * @param data the byte array
      * @param outputFile the file in which to write the audio data could not be
